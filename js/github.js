@@ -63,13 +63,15 @@ export class Depot {
     try {
       return await fetch(url, opts);
     } catch (e) {
-      throw new ErreurGitHub('Pas de connexion à internet.', { reseau: true });
+      const horsLigne = navigator.onLine === false;
+      const detail = e && e.message ? ` (${e.message})` : '';
+      throw new ErreurGitHub(horsLigne ? 'Pas de connexion à internet.' : `Impossible de joindre GitHub${detail}.`, { reseau: true });
     }
   }
 
   // Vérifie la clé et les droits d'écriture.
   async verifier() {
-    const r = await this.appel(`${API}/repos/${this.owner}/${this.repo}`, { headers: this.entetes({ Accept: 'application/vnd.github+json' }), cache: 'no-store' });
+    const r = await this.appel(`${API}/repos/${this.owner}/${this.repo}?t=${Date.now()}`, { headers: this.entetes({ Accept: 'application/vnd.github+json' }) });
     if (!r.ok) throw new ErreurGitHub(message(r.status), { statut: r.status });
     const j = await r.json();
     if (j.permissions && !j.permissions.push) throw new ErreurGitHub('La clé permet de lire le dépôt mais pas d’y écrire.', { statut: 403 });
@@ -78,9 +80,8 @@ export class Depot {
 
   // Lit un fichier : { texte, sha } ou { texte: null } s'il n'existe pas.
   async lire(chemin) {
-    const r = await this.appel(`${this.url(chemin)}?ref=${encodeURIComponent(this.branche)}`, {
+    const r = await this.appel(`${this.url(chemin)}?ref=${encodeURIComponent(this.branche)}&t=${Date.now()}`, {
       headers: this.entetes({ Accept: 'application/vnd.github.raw+json' }),
-      cache: 'no-cache',
     });
     if (r.status === 404) return { texte: null, sha: null };
     if (!r.ok) throw new ErreurGitHub(message(r.status), { statut: r.status });

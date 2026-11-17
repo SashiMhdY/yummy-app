@@ -262,7 +262,11 @@ export const store = {
   },
 
   async connecter({ owner, repo, token }) {
-    const config = { ...this.config, owner: owner.trim(), repo: repo.trim(), token: token.trim() };
+    // espaces, retours à la ligne et caractères invisibles ajoutés au copier-coller
+    const cle = String(token).replace(/[\s\u200B-\u200D\u2060\uFEFF]/g, '');
+    if (!/^[A-Za-z0-9_]+$/.test(cle)) throw new Error('La clé contient des caractères inattendus. Recopie-la depuis GitHub : elle ne contient que des lettres, des chiffres et des « _ ».');
+    if (!/^(github_pat_|ghp_)/.test(cle)) throw new Error('Ce texte ne ressemble pas à une clé GitHub : une clé commence par « github_pat_ ».');
+    const config = { ...this.config, owner: owner.trim(), repo: repo.trim(), token: cle };
     await new Depot(config).verifier();
     this.config = config;
     LS.set('config', config);
