@@ -3,7 +3,7 @@
 // quand le réseau répond vite, sinon la copie en cache.
 // Les appels à l'API GitHub ne passent pas par ce cache.
 
-const CACHE = 'yummy-app-v1';
+const CACHE = 'yummy-app-v2';
 const FICHIERS = [
   './',
   './index.html',
@@ -16,12 +16,14 @@ const FICHIERS = [
   './js/util.js',
   './js/md.js',
   './js/nutrition.js',
+  './js/photos.js',
   './js/vendor/htm-preact.js',
   './js/views/semaine.js',
   './js/views/courses.js',
   './js/views/recettes.js',
   './js/views/edition.js',
   './js/views/reglages.js',
+  './js/views/profils.js',
   './data/aliments.json',
   './fonts/sofia-sans-latin-400-normal.woff2',
   './fonts/sofia-sans-latin-600-normal.woff2',

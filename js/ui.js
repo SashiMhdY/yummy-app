@@ -23,6 +23,8 @@ export const Ico = {
   horloge: () => svg('<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>'),
   coche: () => svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
   chercher: () => svg('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/>'),
+  profils: () => svg('<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.5 14.6a4.5 4.5 0 0 1 5 4.9"/>'),
+  photo: () => svg('<path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13.2" r="3.3"/>'),
 };
 
 export function Plaque({ children, sous, grande }) {
@@ -60,6 +62,7 @@ const ONGLETS = [
   ['semaine', 'Semaine', Ico.semaine],
   ['recettes', 'Recettes', Ico.recettes],
   ['courses', 'Courses', Ico.courses],
+  ['profils', 'Profils', Ico.profils],
   ['reglages', 'Réglages', Ico.reglages],
 ];
 

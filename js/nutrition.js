@@ -9,7 +9,7 @@ export const MACROS = [
 ];
 
 export function macrosRecette(recette, aliments) {
-  const t = { kcal: 0, proteines: 0, glucides: 0, lipides: 0, manquants: [] };
+  const t = { kcal: 0, proteines: 0, glucides: 0, lipides: 0, fibres: 0, manquants: [] };
   for (const ing of recette.ingredients || []) {
     const a = ing.aliment && aliments[ing.aliment];
     if (estEau(ing)) continue;
@@ -22,6 +22,7 @@ export function macrosRecette(recette, aliments) {
     t.proteines += (a.proteines || 0) * k;
     t.glucides += (a.glucides || 0) * k;
     t.lipides += (a.lipides || 0) * k;
+    t.fibres += (a.fibres || 0) * k;
   }
   return t;
 }
@@ -29,7 +30,67 @@ export function macrosRecette(recette, aliments) {
 export function parPart(recette, aliments) {
   const t = macrosRecette(recette, aliments);
   const p = Math.max(1, recette.portions || 1);
-  return { kcal: t.kcal / p, proteines: t.proteines / p, glucides: t.glucides / p, lipides: t.lipides / p, manquants: t.manquants };
+  return { kcal: t.kcal / p, proteines: t.proteines / p, glucides: t.glucides / p, lipides: t.lipides / p, fibres: t.fibres / p, manquants: t.manquants };
+}
+
+// ---------- Besoins journaliers d'un profil ----------
+// Sources :
+// - Adultes, métabolisme de base : Black et al. (1996), en MJ/j, × 1000 / 4,1855 pour les kcal ;
+//   multiplié par le niveau d'activité physique (NAP 1,4 / 1,6 / 1,8 / 2,0, valeurs retenues par l'EFSA, 2013).
+// - Enfants, énergie : besoins moyens de l'EFSA (2013), NAP 1,4 de 1 à 9 ans, 1,6 à 10 ans.
+// - Protéines : 0,83 g/kg/j chez l'adulte (Anses) ; enfants : références EFSA (2012) en g/kg/j.
+// - Lipides 35 à 40 % et glucides 40 à 55 % de l'apport énergétique (Anses 2016, enfants de 4 à 17 ans : Anses 2019).
+// - Fibres : 30 g/j chez l'adulte, 14 g de 4 à 6 ans, 16 g de 7 à 10 ans, 19 g de 11 à 17 ans (Anses 2016 et 2019).
+export const ACTIVITES = [
+  [1.4, 'Sédentaire'],
+  [1.6, 'Modérément actif'],
+  [1.8, 'Actif'],
+  [2.0, 'Très actif'],
+];
+const EFSA_ENERGIE_ENFANT = {
+  // âge : [fille, garçon] en kcal/j
+  1: [712, 777], 2: [946, 1028], 3: [1096, 1174], 4: [1168, 1256], 5: [1239, 1332],
+  6: [1312, 1409], 7: [1392, 1497], 8: [1477, 1592], 9: [1566, 1684], 10: [1818, 1933],
+};
+const EFSA_PROTEINES_ENFANT = {
+  1: 1.14, 2: 0.97, 3: 0.9, 4: 0.86, 5: 0.85, 6: 0.89, 7: 0.91, 8: 0.92, 9: 0.91, 10: 0.91,
+  // 11 à 17 ans : [fille, garçon]
+  11: [0.9, 0.91], 12: [0.89, 0.9], 13: [0.88, 0.9], 14: [0.87, 0.89], 15: [0.85, 0.88], 16: [0.84, 0.87], 17: [0.83, 0.86],
+};
+
+export function besoins(p) {
+  const age = Number(p.age);
+  const poids = Number(p.poids);
+  const taille = Number(p.taille) / 100;
+  const garcon = p.sexe === 'homme' ? 1 : 0;
+  const r = { kcal: null, proteines: null, lipides: null, glucides: null, fibres: null, methode: '', manque: [] };
+  if (!age) r.manque.push('l’âge');
+  if (!poids) r.manque.push('le poids');
+  if (age >= 18 && !taille) r.manque.push('la taille');
+  if (r.manque.length) return r;
+
+  if (age >= 18) {
+    const mj = (garcon ? 1.083 : 0.963) * poids ** 0.48 * taille ** 0.5 * age ** -0.13;
+    const nap = Number(p.activite) || 1.6;
+    r.kcal = ((mj * 1000) / 4.1855) * nap;
+    r.methode = 'formule de Black';
+    r.proteines = 0.83 * poids;
+    r.fibres = 30;
+  } else {
+    const e = EFSA_ENERGIE_ENFANT[age];
+    if (e) {
+      r.kcal = e[garcon];
+      r.methode = 'besoin moyen de l’EFSA pour cet âge';
+    }
+    const pr = EFSA_PROTEINES_ENFANT[age];
+    if (pr) r.proteines = (Array.isArray(pr) ? pr[garcon] : pr) * poids;
+    r.fibres = age >= 11 ? 19 : age >= 7 ? 16 : age >= 4 ? 14 : null;
+  }
+  if (r.kcal && age >= 4) {
+    r.lipides = { min: (r.kcal * 0.35) / 9, max: (r.kcal * 0.4) / 9 };
+    r.glucides = { min: (r.kcal * 0.4) / 4, max: (r.kcal * 0.55) / 4 };
+  }
+  return r;
 }
 
 const estEau = (ing) => /^eau\b/.test(norm(ing.aliment || '')) || /^eau\b/.test(norm(ing.nom));

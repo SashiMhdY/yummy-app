@@ -6,6 +6,7 @@ import { Courses } from './views/courses.js';
 import { Recettes, Recette } from './views/recettes.js';
 import { Edition } from './views/edition.js';
 import { Reglages, Accueil } from './views/reglages.js';
+import { Profils } from './views/profils.js';
 
 function lireRoute() {
   const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
@@ -34,16 +35,16 @@ function App() {
   let onglet = p[0] || localStorage.getItem('yummy.onglet') || 'semaine';
   if (onglet === 'recette' && p[2] === 'modifier') vue = html`<${Edition} key=${p[1]} id=${p[1]} />`;
   else if (onglet === 'recette') vue = html`<${Recette} key=${p[1]} id=${p[1]} q=${q} />`;
-  else if (onglet === 'nouvelle-recette') vue = html`<${Edition} key="nouvelle" />`;
   else if (onglet === 'courses') vue = html`<${Courses} q=${q} />`;
   else if (onglet === 'recettes') vue = html`<${Recettes} />`;
   else if (onglet === 'reglages') vue = html`<${Reglages} />`;
+  else if (onglet === 'profils') vue = html`<${Profils} />`;
   else {
     onglet = 'semaine';
     vue = html`<${Semaine} q=${q} />`;
   }
-  const actif = ['recette', 'nouvelle-recette'].includes(onglet) ? 'recettes' : onglet;
-  if (['semaine', 'recettes', 'courses'].includes(actif)) localStorage.setItem('yummy.onglet', actif);
+  const actif = onglet === 'recette' ? 'recettes' : onglet;
+  if (['semaine', 'recettes', 'courses', 'profils'].includes(actif)) localStorage.setItem('yummy.onglet', actif);
 
   return html`
     <${BanniereMaj} />
