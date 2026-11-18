@@ -117,6 +117,8 @@ export function Edition({ id }) {
     naviguer(`#/recette/${r.id}`);
   };
 
+  if (!existante)
+    return html`<main class="vue"><${Barre} retour="#/recettes" retourLabel="Recettes" /><div class="vide"><p>Cette recette n’existe pas.</p></div></main>`;
   return html`<main class="vue">
     <${Barre} retour=${existante ? `#/recette/${existante.id}` : '#/recettes'} retourLabel="Annuler" />
     <${Plaque}>${existante ? 'Modifier la recette' : 'Nouvelle recette'}<//>

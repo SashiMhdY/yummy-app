@@ -4,10 +4,42 @@ import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer } from '../ui
 import { norm, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
 import { parPart } from '../nutrition.js';
 import { md } from '../md.js';
+import { usePhoto, envoyerPhoto } from '../photos.js';
 import { MOMENTS } from './semaine.js';
 
 const LS_FILTRE = 'yummy.filtreType';
 
+// ---------- Photos ----------
+function Image({ chemin, alt = '', classe = '' }) {
+  const { url, echec } = usePhoto(chemin);
+  return html`<span class=${`image ${classe}${url ? ' prete' : ''}`}>
+    ${url ? html`<img src=${url} alt=${alt} decoding="async" />` : echec ? html`<span class="image-echec">Photo indisponible</span>` : null}
+  </span>`;
+}
+
+function BoutonPhoto({ recette, classe, label, children }) {
+  const [envoi, setEnvoi] = useState(false);
+  const choisir = async (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    setEnvoi(true);
+    try {
+      await envoyerPhoto(recette, f);
+      store.afficher('Photo ajoutée');
+    } catch (err) {
+      store.afficher(err.message || 'La photo n’a pas pu être envoyée.');
+    } finally {
+      setEnvoi(false);
+    }
+  };
+  return html`<label class=${`${classe}${envoi ? ' envoi' : ''}`} title=${label}>
+    <input type="file" accept="image/*" class="masque" onChange=${choisir} disabled=${envoi} aria-label=${label} />
+    ${envoi ? html`<span class="envoi-texte">Envoi…</span>` : children}
+  </label>`;
+}
+
+// ---------- Liste ----------
 export function Recettes() {
   const s = useStore();
   const [q, setQ] = useState('');
@@ -30,9 +62,7 @@ export function Recettes() {
   };
 
   return html`<main class="vue">
-    <${Barre}>
-      <a class="btn btn-petit" href="#/nouvelle-recette">${Ico.plus()}<span>Nouvelle recette</span></a>
-    <//>
+    <${Barre} />
     <${Plaque} sous=${`${recettes.length} recettes dans le livre`}>Recettes<//>
     <label class="recherche">
       ${Ico.chercher()}
@@ -44,8 +74,11 @@ export function Recettes() {
     <ul class="liste-recettes">
       ${liste.map((r) => {
         const pp = parPart(r, s.aliments);
-        return html`<li key=${r.id}>
-          <a href=${`#/recette/${r.id}`}>
+        return html`<li key=${r.id} class="ligne-recette">
+          ${r.photo
+            ? html`<a href=${`#/recette/${r.id}`} class="vignette" tabindex="-1" aria-hidden="true"><${Image} chemin=${r.photo.mini} /></a>`
+            : html`<${BoutonPhoto} recette=${r} classe="vignette vignette-vide" label=${`Ajouter une photo de ${r.nom}`}>${Ico.plus()}<//>`}
+          <a href=${`#/recette/${r.id}`} class="ligne-texte">
             <span class="liste-nom">${r.nom}</span>
             <span class="liste-meta">
               <span>${r.type}</span>
@@ -58,11 +91,12 @@ export function Recettes() {
     </ul>
     ${!liste.length &&
     html`<div class="vide">
-      ${recettes.length ? html`<p>Aucune recette ne correspond à cette recherche.</p>` : html`<p>Le livre est vide. Ajoute ta première recette, ou envoie la photo d’une recette à Claude.</p>`}
+      ${recettes.length ? html`<p>Aucune recette ne correspond à cette recherche.</p>` : html`<p>Le livre est vide.</p><p>Les recettes s’ajoutent en envoyant la photo d’une recette à Claude.</p>`}
     </div>`}
   </main>`;
 }
 
+// ---------- Fiche ----------
 export function Recette({ id, q }) {
   const s = useStore();
   const r = s.local.recettes.recettes.find((x) => x.id === id);
@@ -87,7 +121,15 @@ export function Recette({ id, q }) {
     <${Barre} retour="#/recettes" retourLabel="Recettes">
       <a class="btn btn-petit btn-second" href=${`#/recette/${r.id}/modifier`}>Modifier</a>
     <//>
-    <${Plaque} sous=${[r.type, ...(r.sources || [])].filter(Boolean).join(', ')}>${r.nom}<//>
+    ${r.photo
+      ? html`<figure class="photo-plat">
+          <${Image} chemin=${r.photo.grande} alt=${`Photo du plat : ${r.nom}`} />
+          <${BoutonPhoto} recette=${r} classe="photo-changer" label="Changer la photo">${Ico.photo()}<//>
+        </figure>`
+      : html`<${BoutonPhoto} recette=${r} classe="photo-vide" label="Ajouter une photo du plat">${Ico.plus()}<span>Ajouter une photo du plat</span><//>`}
+    <div class=${r.photo ? 'tete-sur-photo' : ''}>
+      <${Plaque} sous=${[r.type, ...(r.sources || [])].filter(Boolean).join(', ')}>${r.nom}<//>
+    </div>
 
     <dl class="faits">
       ${r.preparation > 0 && html`<div><dt>Préparation</dt><dd>${duree(r.preparation)}</dd></div>`}

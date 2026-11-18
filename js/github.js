@@ -25,7 +25,10 @@ export async function shaBlob(texte) {
 }
 
 function base64(texte) {
-  const octets = enc.encode(texte);
+  return base64Octets(enc.encode(texte));
+}
+
+function base64Octets(octets) {
   let bin = '';
   for (let i = 0; i < octets.length; i += 0x8000) bin += String.fromCharCode(...octets.subarray(i, i + 0x8000));
   return btoa(bin);
@@ -87,6 +90,26 @@ export class Depot {
     if (!r.ok) throw new ErreurGitHub(message(r.status), { statut: r.status });
     const texte = await r.text();
     return { texte, sha: await shaBlob(texte) };
+  }
+
+  // Lit un fichier binaire (photo) : Blob, ou null s'il n'existe pas.
+  async lireBinaire(chemin) {
+    const r = await this.appel(`${this.url(chemin)}?ref=${encodeURIComponent(this.branche)}`, {
+      headers: this.entetes({ Accept: 'application/vnd.github.raw+json' }),
+    });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new ErreurGitHub(message(r.status), { statut: r.status });
+    return r.blob();
+  }
+
+  // Crée un fichier binaire (nouvelle photo).
+  async creerBinaire(chemin, octets, msg) {
+    const r = await this.appel(this.url(chemin), {
+      method: 'PUT',
+      headers: this.entetes({ Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message: msg, content: base64Octets(octets), branch: this.branche }),
+    });
+    if (!r.ok) throw new ErreurGitHub(message(r.status), { statut: r.status });
   }
 
   // Écrit un fichier ; échoue avec conflit=true si le fichier a changé depuis la lecture.

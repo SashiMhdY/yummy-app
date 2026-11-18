@@ -4,11 +4,12 @@
 // version du fichier en cas de modification simultanée sur un autre appareil).
 import { Depot, ErreurGitHub } from './github.js';
 
-const CHEMINS = { recettes: 'data/recettes.json', planning: 'data/planning.json', courses: 'data/courses.json' };
+const CHEMINS = { recettes: 'data/recettes.json', planning: 'data/planning.json', courses: 'data/courses.json', profils: 'data/profils.json' };
 const VIDES = {
   recettes: () => ({ version: 1, recettes: [] }),
   planning: () => ({ version: 1, repas: {} }),
   courses: () => ({ version: 1, coches: {}, extras: {} }),
+  profils: () => ({ version: 1, profils: [], consommations: {} }),
 };
 const CONFIG_DEFAUT = { owner: 'SashiMhdY', repo: 'yummy', token: '', parts: null };
 
@@ -83,6 +84,30 @@ const OPS = {
     'recette.supprimer'(d, { id }) {
       d.recettes = d.recettes.filter((r) => r.id !== id);
     },
+    'recette.photo'(d, { id, photo }) {
+      const r = d.recettes.find((x) => x.id === id);
+      if (r) r.photo = photo;
+    },
+  },
+  profils: {
+    'profil.enregistrer'(d, { profil }) {
+      const i = d.profils.findIndex((p) => p.id === profil.id);
+      if (i >= 0) d.profils[i] = profil;
+      else d.profils.push(profil);
+    },
+    'profil.supprimer'(d, { id }) {
+      d.profils = d.profils.filter((p) => p.id !== id);
+      for (const j of Object.values(d.consommations)) delete j[id];
+    },
+    // portion mangée d'un plat du menu (0 = n'en a pas mangé) ; null revient à la part habituelle
+    'conso.regler'(d, { date, profil, entree, portion }) {
+      const j = (d.consommations[date] ||= {});
+      const p = (j[profil] ||= {});
+      if (portion == null) delete p[entree];
+      else p[entree] = portion;
+      if (!Object.keys(p).length) delete j[profil];
+      if (!Object.keys(j).length) delete d.consommations[date];
+    },
   },
 };
 
@@ -96,6 +121,10 @@ const MESSAGES = {
   'coches.vider': 'Courses : liste remise à zéro',
   'recette.enregistrer': 'Recettes : recette enregistrée',
   'recette.supprimer': 'Recettes : recette supprimée',
+  'recette.photo': 'Recettes : photo ajoutée',
+  'profil.enregistrer': 'Profils : profil enregistré',
+  'profil.supprimer': 'Profils : profil supprimé',
+  'conso.regler': 'Profils : repas mis à jour',
 };
 
 function appliquer(doc, data, ops) {
@@ -176,7 +205,7 @@ export const store = {
       }
     });
     setInterval(() => {
-      if (document.visibilityState === 'visible' && this.connecte && !this.envoiEnCours) this.rafraichir(['planning', 'courses']);
+      if (document.visibilityState === 'visible' && this.connecte && !this.envoiEnCours) this.rafraichir(['planning', 'courses', 'profils']);
     }, 45000);
   },
 

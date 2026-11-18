@@ -2,7 +2,7 @@ import { html, useState } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
 import { useStore, Plaque, Barre, Compteur } from '../ui.js';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.1.0';
 
 function FormConnexion({ bouton }) {
   const s = useStore();

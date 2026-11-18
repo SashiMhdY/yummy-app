@@ -119,7 +119,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Onglets ---------- */
 .onglets {
   position: fixed; inset: auto 0 0 0; z-index: 20;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   height: calc(var(--onglets-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: rgba(255, 255, 255, 0.94);
@@ -313,15 +313,15 @@ blockquote { margin: 0.75rem 0; padding-left: 0.8rem; border-left: 3px solid var
 .rayon-placard summary span { color: var(--chine); font-size: var(--t-s); text-decoration: underline; text-underline-offset: 3px; }
 .article { display: flex; align-items: center; border-bottom: 1px solid var(--trait); }
 .article label { position: relative; flex: 1; display: flex; align-items: center; gap: 0.75rem; min-height: 3.25rem; padding: 0.5rem 0; cursor: pointer; min-width: 0; }
-.article input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.article input, .repas-coche input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .case {
   flex: none; display: grid; place-items: center; width: 1.75rem; height: 1.75rem;
   border: 2px solid #9AA6B8; border-radius: 0.45rem; background: var(--blanc); color: transparent;
   transition: background 0.12s, border-color 0.12s;
 }
 .case .ico { width: 1.15rem; height: 1.15rem; stroke-width: 2.6; }
-.article input:checked + .case { background: var(--cobalt); border-color: var(--cobalt); color: var(--blanc); }
-.article input:focus-visible + .case { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+input:checked + .case { background: var(--cobalt); border-color: var(--cobalt); color: var(--blanc); }
+input:focus-visible + .case { outline: 2px solid var(--cobalt); outline-offset: 2px; }
 .article-texte { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .article-nom { font-weight: 600; }
 .article-detail { color: var(--chine); font-size: var(--t-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -329,6 +329,75 @@ blockquote { margin: 0.75rem 0; padding-left: 0.8rem; border-left: 3px solid var
 .article.coche .article-nom, .article.coche .article-qte { color: #8B95A6; text-decoration: line-through; text-decoration-thickness: 1.5px; }
 .btn-retirer { color: var(--chine); }
 .ajout-article { margin-top: 1.5rem; }
+
+
+/* ---------- Photos ---------- */
+.masque { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); }
+.image { display: block; width: 100%; height: 100%; background: #E4E9F0; }
+.image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.image-echec { display: grid; place-items: center; height: 100%; color: var(--chine); font-size: var(--t-xs); text-align: center; padding: 0.25rem; }
+.ligne-recette { display: flex; align-items: center; gap: 0.85rem; }
+.liste-recettes .ligne-texte { flex: 1; min-width: 0; }
+.liste-recettes .vignette, .vignette {
+  position: relative; flex: none; display: block; width: 4rem; height: 4rem; padding: 0;
+  border-radius: 0.6rem; overflow: hidden; background: #E4E9F0;
+}
+.liste-recettes .vignette-vide, .vignette-vide {
+  display: grid; place-items: center; cursor: pointer;
+  background: var(--blanc); border: 1.5px dashed #AFBACB; color: var(--cobalt);
+}
+.vignette-vide:focus-within, .photo-vide:focus-within, .photo-changer:focus-within { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+.envoi { opacity: 0.6; cursor: progress; }
+.envoi-texte { font-size: var(--t-xs); font-weight: 600; color: var(--cobalt); }
+.photo-plat { position: relative; margin: 0.25rem 0 0; aspect-ratio: 4 / 3; border-radius: 0.9rem; overflow: hidden; background: #E4E9F0; }
+.photo-changer {
+  position: absolute; top: 0.6rem; right: 0.6rem; display: grid; place-items: center;
+  width: 2.75rem; height: 2.75rem; border-radius: 999px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.88); color: var(--cobalt); box-shadow: 0 1px 4px rgba(24, 32, 46, 0.2);
+}
+.tete-sur-photo { position: relative; z-index: 1; margin-top: -2.3rem; padding-left: 0.75rem; }
+.tete-sur-photo .plaque-zone { margin-top: 0; }
+.photo-vide {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 0.25rem 0 1rem;
+  min-height: 7rem; border: 1.5px dashed #AFBACB; border-radius: 0.9rem; background: var(--blanc);
+  color: var(--cobalt); font-weight: 600; cursor: pointer;
+}
+
+/* ---------- Profils ---------- */
+.profils-choix { margin-top: 0; }
+.filtre-ajout { display: inline-flex; align-items: center; gap: 0.25rem; border-style: dashed; color: var(--cobalt); }
+.filtre-ajout .ico { width: 1.1rem; height: 1.1rem; }
+.fiche-profil { margin-top: 0.75rem; }
+.profil-tete { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.profil-ident { margin: 0; font-weight: 600; }
+.alerte-douce { margin: 0.75rem 0; padding: 0.65rem 0.8rem; border-radius: 0.55rem; background: #FFF8DF; border: 1px solid #E8D28A; color: #5E4700; font-size: var(--t-s); }
+.nav-jour { display: grid; grid-template-columns: auto 1fr auto; align-items: center; margin: 1rem -0.6rem 0.25rem; }
+.nav-jour-titre { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.nav-jour-titre strong::first-letter { text-transform: uppercase; }
+.nav-jour-titre .btn-lien { padding: 0.15rem; font-size: var(--t-xs); }
+.jauges { list-style: none; margin: 0.5rem 0 0; padding: 0; }
+.jauge { padding: 0.7rem 0; border-bottom: 1px solid var(--trait); }
+.jauge-tete { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.jauge-nom { font-weight: 700; }
+.jauge-pct { font-family: var(--plaque); font-weight: 800; font-size: var(--t-xl); line-height: 1; color: var(--cobalt); }
+.jauge-barre { position: relative; height: 0.85rem; margin: 0.4rem 0 0.3rem; border-radius: 999px; background: var(--trait); }
+.jauge-plage { position: absolute; top: 0; bottom: 0; background: rgba(29, 60, 140, 0.16); border-left: 1.5px solid rgba(29, 60, 140, 0.45); border-right: 1.5px solid rgba(29, 60, 140, 0.45); }
+.jauge-rempli { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--cobalt); transition: width 0.3s ease-out; }
+.jauge-repere { position: absolute; top: -0.25rem; bottom: -0.25rem; width: 2px; margin-left: -1px; background: var(--encre); border-radius: 1px; }
+.depasse .jauge-rempli { background: var(--cobalt-sombre); }
+.jauge-detail { margin: 0; color: var(--chine); font-size: var(--t-s); }
+.titre-section { margin: 1.75rem 0 0.25rem; font-size: var(--t-l); font-weight: 700; }
+.repas-profil { list-style: none; margin: 0; padding: 0; }
+.repas-profil li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 0.75rem; padding: 0.35rem 0; border-bottom: 1px solid var(--trait); }
+.repas-coche { position: relative; flex: 1 1 12rem; display: flex; align-items: center; gap: 0.75rem; min-height: 3.25rem; cursor: pointer; min-width: 0; }
+.repas-texte { display: flex; flex-direction: column; min-width: 0; }
+.repas-nom { font-weight: 600; }
+.repas-detail { color: var(--chine); font-size: var(--t-xs); }
+.pas-mange .repas-nom { color: #8B95A6; }
+.compteur-petit output { min-width: 4.75rem; font-size: var(--t-s); text-align: center; }
+.compteur-petit .btn-icone { width: 2.5rem; height: 2.5rem; }
+.grille-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.note { margin-top: 1.5rem; font-size: var(--t-xs); line-height: 1.5; }
 
 /* ---------- États ---------- */
 .vide { margin: 1.5rem 0; padding: 1.25rem; border: 1px dashed #B5C0D0; border-radius: 0.75rem; text-align: center; color: var(--chine); }
