@@ -2,7 +2,7 @@ import { html, useState } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
 import { useStore, Plaque, Barre, Compteur } from '../ui.js';
 
-export const VERSION = '1.3.1'; // garder le même numéro que CACHE dans sw.js
+export const VERSION = '1.4.0'; // garder le même numéro que CACHE dans sw.js
 
 function FormConnexion({ bouton }) {
   const s = useStore();
