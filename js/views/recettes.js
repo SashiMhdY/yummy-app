@@ -7,9 +7,15 @@ import { md } from '../md.js';
 import { usePhoto, envoyerPhoto, envoyerCouverture } from '../photos.js';
 import { MOMENTS } from './semaine.js';
 
-const LS_FILTRE = 'yummy.filtreType';
 const LS_TRI = 'yummy.triRecettes';
+try {
+  localStorage.removeItem('yummy.filtreType'); // ancien filtre mémorisé
+} catch {
+  /* stockage indisponible */
+}
 const SANS_LIVRE = 'Sans livre';
+// Filtre de type gardé seulement pendant que l'app est ouverte (retour depuis une recette), jamais d'une ouverture à l'autre.
+let filtreSession = '';
 const parNom = (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' });
 
 // ---------- Photos ----------
@@ -46,7 +52,7 @@ function BoutonPhoto({ envoyer, classe, label, children }) {
 export function Recettes() {
   const s = useStore();
   const [q, setQ] = useState('');
-  const [type, setType] = useState(() => localStorage.getItem(LS_FILTRE) || '');
+  const [type, setType] = useState(filtreSession);
   const [tri, setTri] = useState(() => (localStorage.getItem(LS_TRI) === 'livre' ? 'livre' : 'nom'));
   const recettes = s.local.recettes.recettes;
   const couvertures = s.local.recettes.livres || {};
@@ -75,7 +81,7 @@ export function Recettes() {
   }, [liste, tri]);
   const choisirType = (t) => {
     const v = t === type ? '' : t;
-    localStorage.setItem(LS_FILTRE, v);
+    filtreSession = v;
     setType(v);
   };
   const choisirTri = (t) => {
