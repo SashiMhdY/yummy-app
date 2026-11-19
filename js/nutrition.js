@@ -112,9 +112,9 @@ export const RAYONS = [
 ];
 
 const PAR_NOM = [
-  [/feuilletee|pate brisee|pate sablee|pate a pizza|galette de sarrasin|levure de boulanger/, 'frais'],
+  [/feuilletee|pate brisee|pate sablee|pate a pizza|galette de sarrasin|levure de boulanger(?! deshydratee)/, 'frais'],
   [/^oeuf/, 'cremerie'],
-  [/farine|fecule|amidon|flocon|semoule|couscous|levure chimique/, 'epicerie'],
+  [/farine|fecule|amidon|flocon|semoule|couscous|levure chimique|levure de boulanger deshydratee/, 'epicerie'],
   [/^ail, cru|ciboul|coriandre|menthe|persil|thym, frais|herbes aromatiques fraiches|raifort|basilic, frais|aneth/, 'fruits-legumes'],
 ];
 
@@ -145,6 +145,7 @@ const PAR_SOUS_GROUPE = {
   'cremes et specialites a base de creme': 'cremerie',
   laits: 'cremerie',
   'produits laitiers frais et assimiles': 'cremerie',
+  'produits laitiers frais et alternatives vegetales': 'cremerie',
   beurres: 'cremerie',
   'pains et assimiles': 'boulangerie',
   'chocolats et produits a base de chocolat': 'epicerie-sucree',

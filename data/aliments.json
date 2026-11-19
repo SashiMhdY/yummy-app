@@ -1,5 +1,5 @@
 {
- "source": "ANSES, table Ciqual 2020 (extrait du coffre)",
+ "source": "ANSES, table Ciqual 2020 (extrait du coffre), complétée avec la table Ciqual 2025",
  "aliments": {
   "Ail seche, poudre": {
    "groupe": "aides culinaires et ingredients divers",
@@ -461,6 +461,17 @@
    "fibres": 3.2,
    "sel": 0
   },
+  "Farine de ble tendre ou froment T65": {
+   "groupe": "produits cerealiers",
+   "sous_groupe": "farines",
+   "kcal": 346,
+   "proteines": 10,
+   "glucides": 71.5,
+   "lipides": 1,
+   "sucres": 1.5,
+   "fibres": 3.5,
+   "sel": 0.03
+  },
   "Farine de ble tendre ou froment T80": {
    "groupe": "",
    "sous_groupe": "",
@@ -775,6 +786,17 @@
    "fibres": 0.0,
    "sel": 0.11
   },
+  "Lait fermente a boire ou lait ribot, nature, au lait entier": {
+   "groupe": "produits laitiers",
+   "sous_groupe": "produits laitiers frais et alternatives vegetales",
+   "kcal": 52.7,
+   "proteines": 3.38,
+   "glucides": 1.99,
+   "lipides": 3.2,
+   "sucres": 1.99,
+   "fibres": 0,
+   "sel": 0.088
+  },
   "Lardon fume, cru": {
    "groupe": "oeufs",
    "sous_groupe": "charcuteries et assimiles",
@@ -820,6 +842,17 @@
    "fibres": 1.9,
    "sel": null,
    "kcal_estime": true
+  },
+  "Levure de boulanger deshydratee": {
+   "groupe": "aides culinaires et ingredients divers",
+   "sous_groupe": "aides culinaires",
+   "kcal": 341,
+   "proteines": 42.7,
+   "glucides": 14.3,
+   "lipides": 6.56,
+   "sucres": 0,
+   "fibres": 26.9,
+   "sel": 0.13
   },
   "Levure de boulanger, compressee": {
    "groupe": "aides culinaires et ingredients divers",
@@ -947,6 +980,17 @@
    "sucres": 0.77,
    "fibres": 0.0,
    "sel": 0.2
+  },
+  "Oeuf, blanc (blanc d'oeuf), cru": {
+   "groupe": "viandes, oeufs, poissons",
+   "sous_groupe": "oeufs",
+   "kcal": 48.1,
+   "proteines": 10.9,
+   "glucides": 0.73,
+   "lipides": 0.17,
+   "sucres": 0.71,
+   "fibres": 0,
+   "sel": 0.42
   },
   "Oeuf, cru": {
    "groupe": "oeufs",
