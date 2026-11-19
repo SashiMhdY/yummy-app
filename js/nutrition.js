@@ -156,13 +156,48 @@ const PAR_SOUS_GROUPE = {
   'boisson alcoolisees': 'boissons',
   'boissons alcoolisees': 'boissons',
   'boissons sans alcool': 'boissons',
+  // Sous-groupes de la table Ciqual 2025
+  'aides culinaires': 'epicerie',
+  algues: 'epicerie',
+  'denrees destinees a une alimentation particuliere': 'epicerie',
+  'ingredients pour vegetariens': 'frais',
+  'tartinables vegetariens': 'frais',
+  'cereales et biscuits infantiles': 'epicerie',
+  'desserts infantiles': 'epicerie',
+  'laits et boissons infantiles': 'epicerie',
+  'petits pots sales et plats infantiles': 'epicerie',
+  eaux: 'boissons',
+  'feuilletees et autres entrees': 'frais',
+  'pizzas, tartes et crepes salees': 'frais',
+  'plats composes': 'frais',
+  'salades composees et crudites': 'frais',
+  sandwichs: 'frais',
+  'autres matieres grasses': 'epicerie',
+  'huiles de poissons': 'epicerie',
+  margarines: 'cremerie',
+  'biscuits aperitifs': 'epicerie',
+  farines: 'epicerie',
+  'pates a tarte': 'frais',
+  'pates, riz et cereales': 'epicerie',
+  'barres cerealieres': 'epicerie-sucree',
+  'biscuits sucres': 'epicerie-sucree',
+  'confiseries non chocolatees': 'epicerie-sucree',
+  'confitures et assimiles': 'epicerie-sucree',
+  'cereales de petit-dejeuner': 'epicerie-sucree',
+  viennoiseries: 'boulangerie',
+  'autres produits a base de viande': 'boucherie',
+  'charcuteries et alternatives vegetales': 'charcuterie',
+  'produits a base de poissons et produits de la mer': 'boucherie',
 };
 
 export function rayon(alimentNom, aliments) {
   const n = norm(alimentNom);
   if (!n) return 'autres';
-  for (const [re, r] of PAR_NOM) if (re.test(n)) return r;
   const sg = norm(aliments[alimentNom]?.sous_groupe);
+  // herbes fraîches au rayon fruits et légumes, herbes séchées avec les épices
+  if (sg === 'herbes') return /^ail, cru|frais|fraich/.test(n) ? 'fruits-legumes' : 'placard';
+  if (sg === 'epices' || sg === 'sels') return 'placard';
+  for (const [re, r] of PAR_NOM) if (re.test(n)) return r;
   if (PAR_SOUS_GROUPE[sg]) return PAR_SOUS_GROUPE[sg];
   if (/^sucre/.test(n)) return 'epicerie-sucree';
   return 'autres';
