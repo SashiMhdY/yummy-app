@@ -24,6 +24,8 @@ export const Ico = {
   coche: () => svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
   chercher: () => svg('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/>'),
   profils: () => svg('<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.5 14.6a4.5 4.5 0 0 1 5 4.9"/>'),
+  etoile: () => svg('<path d="M12 3.6l2.55 5.17 5.7.83-4.13 4.02.98 5.68L12 16.6l-5.1 2.7.98-5.68L3.75 9.6l5.7-.83z"/>'),
+  etoilePleine: () => svg('<path fill="currentColor" d="M12 3.6l2.55 5.17 5.7.83-4.13 4.02.98 5.68L12 16.6l-5.1 2.7.98-5.68L3.75 9.6l5.7-.83z"/>'),
   photo: () => svg('<path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13.2" r="3.3"/>'),
 };
 

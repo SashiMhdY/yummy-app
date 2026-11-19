@@ -15,8 +15,21 @@ try {
 }
 const SANS_LIVRE = 'Sans livre';
 const WEB = 'Recettes du web'; // source des recettes trouvées sur internet, présentées à part
-const TRIS = ['nom', 'livre', 'web'];
+const TRIS = ['nom', 'livre', 'web', 'favoris'];
 const estWeb = (r) => (r.sources || []).find(Boolean) === WEB;
+// Étoile des favoris (partagés par toute la famille, enregistrés dans le livre de recettes).
+function Etoile({ recette, classe = '' }) {
+  const on = Boolean(recette.favori);
+  const basculer = (e) => {
+    e.preventDefault();
+    store.faire('recettes', 'recette.favori', { id: recette.id, favori: !on });
+    store.afficher(on ? 'Retirée des favoris' : 'Ajoutée aux favoris');
+  };
+  return html`<button type="button" class=${`etoile ${classe}`} aria-pressed=${on} aria-label=${on ? `Retirer ${recette.nom} des favoris` : `Ajouter ${recette.nom} aux favoris`} onClick=${basculer}>
+    ${on ? Ico.etoilePleine() : Ico.etoile()}
+  </button>`;
+}
+
 const site = (url) => {
   try {
     return new URL(url).hostname.replace(/^www\./, '');
@@ -82,7 +95,12 @@ export function Recettes() {
       .sort((a, b) => parNom(a.nom, b.nom));
   }, [q, type, recettes]);
   // Par nom : tout ; par livre : sans les recettes du web ; du web : seulement elles.
-  const visibles = useMemo(() => (tri === 'web' ? liste.filter(estWeb) : tri === 'livre' ? liste.filter((r) => !estWeb(r)) : liste), [liste, tri]);
+  const visibles = useMemo(() => {
+    if (tri === 'web') return liste.filter(estWeb);
+    if (tri === 'livre') return liste.filter((r) => !estWeb(r));
+    if (tri === 'favoris') return liste.filter((r) => r.favori);
+    return liste;
+  }, [liste, tri]);
   // Par livre : une section par livre (première source de la recette), livres par ordre alphabétique.
   const livres = useMemo(() => {
     if (tri !== 'livre') return null;
@@ -118,6 +136,7 @@ export function Recettes() {
           ${pp.kcal > 0 && html`<span>${nombre(pp.kcal)} kcal par part</span>`}
         </span>
       </a>
+      <${Etoile} recette=${r} />
     </li>`;
   };
 
@@ -135,6 +154,7 @@ export function Recettes() {
       <button aria-pressed=${tri === 'nom'} onClick=${() => choisirTri('nom')}>Par nom</button>
       <button aria-pressed=${tri === 'livre'} onClick=${() => choisirTri('livre')}>Par livre</button>
       <button aria-pressed=${tri === 'web'} onClick=${() => choisirTri('web')}>Du web</button>
+      <button aria-pressed=${tri === 'favoris'} onClick=${() => choisirTri('favoris')}>Favoris</button>
     </div>
     ${livres
       ? livres.map(([livre, rs]) => {
@@ -155,7 +175,9 @@ export function Recettes() {
       : html`<ul class="liste-recettes">${visibles.map(ligne)}</ul>`}
     ${!visibles.length &&
     html`<div class="vide">
-      ${tri === 'web' && !q && !type
+      ${tri === 'favoris' && !q && !type
+        ? html`<p>Aucun favori pour l’instant.</p><p>Touche l’étoile d’une recette pour la retrouver ici.</p>`
+        : tri === 'web' && !q && !type
         ? html`<p>Aucune recette du web pour l’instant.</p><p>Envoie à Claude le lien ou une capture d’une recette trouvée en ligne.</p>`
         : recettes.length ? html`<p>Aucune recette ne correspond à cette recherche.</p>` : html`<p>Le livre est vide.</p><p>Les recettes s’ajoutent en envoyant la photo d’une recette à Claude.</p>`}
     </div>`}
@@ -185,6 +207,7 @@ export function Recette({ id, q }) {
 
   return html`<main class="vue vue-recette">
     <${Barre} retour="#/recettes" retourLabel="Recettes">
+      <${Etoile} recette=${r} classe="etoile-barre" />
       <a class="btn btn-petit btn-second" href=${`#/recette/${r.id}/modifier`}>Modifier</a>
     <//>
     ${r.photo
