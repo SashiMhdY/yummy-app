@@ -1,7 +1,7 @@
 import { html, useState, useMemo } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
 import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer } from '../ui.js';
-import { norm, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
+import { norm, slug, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
 import { parPart } from '../nutrition.js';
 import { md } from '../md.js';
 import { usePhoto, envoyerPhoto, envoyerCouverture } from '../photos.js';
@@ -15,7 +15,9 @@ try {
 }
 const SANS_LIVRE = 'Sans livre';
 const INCONNU = 'Livre inconnu'; // recettes dont le livre d'origine n'a pas été retrouvé, rangées tout en bas
-const EN_BAS = [SANS_LIVRE, INCONNU]; // sections placées après les livres, dans cet ordre
+const EN_BAS = [SANS_LIVRE, INCONNU];
+// Livres ouverts dans la vue « Par livre » : fermés par défaut, état gardé tant que l'app est ouverte.
+const livresOuverts = new Set(); // sections placées après les livres, dans cet ordre
 const rangLivre = (l) => EN_BAS.indexOf(l) + 1;
 const WEB = 'Recettes du web'; // source des recettes trouvées sur internet, présentées à part
 const TRIS = ['nom', 'livre', 'web', 'favoris'];
@@ -115,6 +117,19 @@ export function Recettes() {
     }
     return [...m].sort(([a], [b]) => rangLivre(a) - rangLivre(b) || parNom(a, b));
   }, [visibles, tri]);
+  const [ouverts, setOuverts] = useState(() => new Set(livresOuverts));
+  const recherche = Boolean(norm(q)) || Boolean(type); // pendant une recherche ou un filtre, tous les livres sont ouverts
+  const basculer = (l) => {
+    if (livresOuverts.has(l)) livresOuverts.delete(l);
+    else livresOuverts.add(l);
+    setOuverts(new Set(livresOuverts));
+  };
+  const toutOuvert = Boolean(livres) && livres.every(([l]) => ouverts.has(l));
+  const toutBasculer = () => {
+    if (toutOuvert) livresOuverts.clear();
+    else livres.forEach(([l]) => livresOuverts.add(l));
+    setOuverts(new Set(livresOuverts));
+  };
   const choisirType = (t) => {
     const v = t === type ? '' : t;
     filtreSession = v;
@@ -159,20 +174,34 @@ export function Recettes() {
       <button aria-pressed=${tri === 'web'} onClick=${() => choisirTri('web')}>Du web</button>
       <button aria-pressed=${tri === 'favoris'} onClick=${() => choisirTri('favoris')}>Favoris</button>
     </div>
+    ${livres && !recherche && livres.length > 1 &&
+    html`<div class="livres-actions"><button type="button" class="lien-discret" onClick=${toutBasculer}>${toutOuvert ? 'Tout fermer' : 'Tout ouvrir'}</button></div>`}
     ${livres
       ? livres.map(([livre, rs]) => {
           const photo = couvertures[livre]?.photo;
           const envoi = (f) => envoyerCouverture(livre, f);
-          return html`<section class="livre" key=${livre}>
+          const ouvert = recherche || ouverts.has(livre);
+          const idListe = `livre-${slug(livre) || 'livre'}`;
+          return html`<section class=${`livre${ouvert ? ' ouvert' : ''}`} key=${livre}>
             <div class="livre-tete">
-              ${EN_BAS.includes(livre)
-                ? null
-                : photo
-                  ? html`<${BoutonPhoto} envoyer=${envoi} classe="couverture" label=${`Changer la couverture de ${livre}`}><${Image} chemin=${photo.mini} /><//>`
-                  : html`<${BoutonPhoto} envoyer=${envoi} classe="couverture couverture-vide" label=${`Ajouter la couverture de ${livre}`}>${Ico.plus()}<//>`}
-              <h2><span class="livre-nom">${livre}</span><small>${rs.length} ${rs.length > 1 ? 'recettes' : 'recette'}</small></h2>
+              ${!EN_BAS.includes(livre) && !photo
+                ? html`<${BoutonPhoto} envoyer=${envoi} classe="couverture couverture-vide" label=${`Ajouter la couverture de ${livre}`}>${Ico.plus()}<//>`
+                : null}
+              <h2>
+                <button type="button" class="livre-bascule" aria-expanded=${ouvert} aria-controls=${idListe} onClick=${() => !recherche && basculer(livre)}>
+                  ${photo && !EN_BAS.includes(livre) ? html`<span class="couverture"><${Image} chemin=${photo.mini} /></span>` : null}
+                  <span class="livre-titre"><span class="livre-nom">${livre}</span><small>${rs.length} ${rs.length > 1 ? 'recettes' : 'recette'}</small></span>
+                  <span class="chevron">${Ico.droite()}</span>
+                </button>
+              </h2>
             </div>
-            <ul class="liste-recettes">${rs.map(ligne)}</ul>
+            ${ouvert &&
+            html`<div id=${idListe}>
+              ${photo && !EN_BAS.includes(livre)
+                ? html`<div class="livre-outils"><${BoutonPhoto} envoyer=${envoi} classe="lien-discret" label=${`Changer la couverture de ${livre}`}>Changer la couverture<//></div>`
+                : null}
+              <ul class="liste-recettes">${rs.map(ligne)}</ul>
+            </div>`}
           </section>`;
         })
       : html`<ul class="liste-recettes">${visibles.map(ligne)}</ul>`}

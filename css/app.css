@@ -220,10 +220,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .segments-tri { margin-top: 0.25rem; }
 .livre { margin: 1.25rem 0 0; }
 .livre-tete { display: flex; align-items: flex-end; gap: 0.85rem; padding-bottom: 0.45rem; border-bottom: 1.5px solid var(--cobalt); }
-.livre h2 { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; margin: 0; font-family: var(--plaque); font-weight: 800; font-size: var(--t-l); color: var(--cobalt); }
+.livre h2 { flex: 1; min-width: 0; margin: 0; font-family: var(--plaque); font-weight: 800; font-size: var(--t-l); color: var(--cobalt); }
+.livre-bascule { display: flex; align-items: flex-end; gap: 0.85rem; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.livre-titre { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.livre-bascule .chevron { flex: none; align-self: center; display: grid; place-items: center; width: 2rem; height: 2rem; color: var(--cobalt); transition: transform 0.2s ease; }
+.livre-bascule[aria-expanded='true'] .chevron { transform: rotate(90deg); }
+.livre-bascule:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; border-radius: 0.3rem; }
+.livres-actions { display: flex; justify-content: flex-end; margin: 0.25rem 0 -0.5rem; }
+.livre-outils { display: flex; justify-content: flex-end; margin-top: 0.35rem; }
+.lien-discret { position: relative; display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0 0.25rem; border: 0; background: none; color: var(--cobalt); font: inherit; font-size: var(--t-s); font-weight: 600; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .livre-bascule .chevron { transition: none; } }
 .livre-nom { display: inline-block; min-width: 0; }
 .livre-nom::first-letter { text-transform: uppercase; }
-.livre h2 small { font-family: var(--texte); font-weight: 400; font-size: var(--t-s); color: var(--chine); }
+.livre-titre small { font-family: var(--texte); font-weight: 400; font-size: var(--t-s); color: var(--chine); }
 .couverture {
   position: relative; flex: none; display: block; width: 3.25rem; height: 4.5rem; border-radius: 0.3rem;
   overflow: hidden; background: #E4E9F0; box-shadow: 0 1px 3px rgba(24, 32, 46, 0.25); cursor: pointer;
