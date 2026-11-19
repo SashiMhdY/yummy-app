@@ -88,6 +88,11 @@ const OPS = {
       const r = d.recettes.find((x) => x.id === id);
       if (r) r.photo = photo;
     },
+    // couverture d'un livre, rangée par nom de livre (celui des « sources » des recettes)
+    'livre.photo'(d, { livre, photo }) {
+      const l = (d.livres ||= {});
+      l[livre] = { ...(l[livre] || {}), photo };
+    },
   },
   profils: {
     'profil.enregistrer'(d, { profil }) {
@@ -122,6 +127,7 @@ const MESSAGES = {
   'recette.enregistrer': 'Recettes : recette enregistrée',
   'recette.supprimer': 'Recettes : recette supprimée',
   'recette.photo': 'Recettes : photo ajoutée',
+  'livre.photo': 'Recettes : couverture de livre ajoutée',
   'profil.enregistrer': 'Profils : profil enregistré',
   'profil.supprimer': 'Profils : profil supprimé',
   'conso.regler': 'Profils : repas mis à jour',
