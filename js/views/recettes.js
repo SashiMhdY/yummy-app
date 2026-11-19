@@ -14,6 +14,9 @@ try {
   /* stockage indisponible */
 }
 const SANS_LIVRE = 'Sans livre';
+const INCONNU = 'Livre inconnu'; // recettes dont le livre d'origine n'a pas été retrouvé, rangées tout en bas
+const EN_BAS = [SANS_LIVRE, INCONNU]; // sections placées après les livres, dans cet ordre
+const rangLivre = (l) => EN_BAS.indexOf(l) + 1;
 const WEB = 'Recettes du web'; // source des recettes trouvées sur internet, présentées à part
 const TRIS = ['nom', 'livre', 'web', 'favoris'];
 const estWeb = (r) => (r.sources || []).find(Boolean) === WEB;
@@ -101,7 +104,7 @@ export function Recettes() {
     if (tri === 'favoris') return liste.filter((r) => r.favori);
     return liste;
   }, [liste, tri]);
-  // Par livre : une section par livre (première source de la recette), livres par ordre alphabétique.
+  // Par livre : une section par livre (première source de la recette), livres par ordre alphabétique, « Livre inconnu » en dernier.
   const livres = useMemo(() => {
     if (tri !== 'livre') return null;
     const m = new Map();
@@ -110,7 +113,7 @@ export function Recettes() {
       if (!m.has(l)) m.set(l, []);
       m.get(l).push(r);
     }
-    return [...m].sort(([a], [b]) => (a === SANS_LIVRE) - (b === SANS_LIVRE) || parNom(a, b));
+    return [...m].sort(([a], [b]) => rangLivre(a) - rangLivre(b) || parNom(a, b));
   }, [visibles, tri]);
   const choisirType = (t) => {
     const v = t === type ? '' : t;
@@ -162,7 +165,7 @@ export function Recettes() {
           const envoi = (f) => envoyerCouverture(livre, f);
           return html`<section class="livre" key=${livre}>
             <div class="livre-tete">
-              ${livre === SANS_LIVRE
+              ${EN_BAS.includes(livre)
                 ? null
                 : photo
                   ? html`<${BoutonPhoto} envoyer=${envoi} classe="couverture" label=${`Changer la couverture de ${livre}`}><${Image} chemin=${photo.mini} /><//>`
