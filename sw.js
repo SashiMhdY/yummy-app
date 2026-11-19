@@ -3,7 +3,9 @@
 // quand le réseau répond vite, sinon la copie en cache.
 // Les appels à l'API GitHub ne passent pas par ce cache.
 
-const CACHE = 'yummy-app-v2';
+// À changer à chaque nouvelle version de l'app (même numéro que VERSION dans js/views/reglages.js) :
+// le téléphone détecte alors la mise à jour et affiche « Nouvelle version disponible ».
+const CACHE = 'yummy-app-1.2.0';
 const FICHIERS = [
   './',
   './index.html',
@@ -36,7 +38,8 @@ const FICHIERS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FICHIERS)).then(() => self.skipWaiting()));
+  // cache: 'reload' : ignore le cache du navigateur pour partir des fichiers tout juste publiés
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FICHIERS.map((f) => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -54,7 +57,8 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     (async () => {
       const cache = await caches.open(CACHE);
-      const reseau = fetch(e.request)
+      // cache: 'no-cache' : redemande toujours au serveur si le fichier a changé (GitHub Pages laisse sinon 10 min de cache)
+      const reseau = fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' })
         .then((r) => {
           if (r.ok) cache.put(e.request, r.clone());
           return r;
