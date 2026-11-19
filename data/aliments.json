@@ -1394,6 +1394,17 @@
    "fibres": 0.0,
    "sel": 3.22
   },
+  "Roquette, crue": {
+   "groupe": "fruits, legumes, legumineuses et oleagineux",
+   "sous_groupe": "legumes",
+   "kcal": 27.9,
+   "proteines": 2.58,
+   "glucides": 2.1,
+   "lipides": 0.66,
+   "sucres": 2.05,
+   "fibres": 1.6,
+   "sel": 0.068
+  },
   "Rosette ou Fuseau": {
    "groupe": "oeufs",
    "sous_groupe": "charcuteries et assimiles",
