@@ -69,6 +69,17 @@
    "fibres": 2.7,
    "sel": 0
   },
+  "Basilic, frais": {
+   "groupe": "aides culinaires et ingredients divers",
+   "sous_groupe": "herbes",
+   "kcal": 35.2,
+   "proteines": 3.15,
+   "glucides": 3.4,
+   "lipides": 0.64,
+   "sucres": 0.3,
+   "fibres": 1.6,
+   "sel": 0.01
+  },
   "Beurre a 82% MG, doux": {
    "groupe": "matieres grasses",
    "sous_groupe": "beurres",
@@ -79,6 +90,17 @@
    "sucres": 0.83,
    "fibres": 0.0,
    "sel": 0.063
+  },
+  "Boeuf, steak hache 15% MG, cru": {
+   "groupe": "viandes, oeufs, poissons",
+   "sous_groupe": "viandes crues",
+   "kcal": 215,
+   "proteines": 20.2,
+   "glucides": 0.47,
+   "lipides": 14.8,
+   "sucres": 0,
+   "fibres": 0,
+   "sel": 0.1
   },
   "Boeuf, steak hache 15% MG, cuit": {
    "groupe": "oeufs",
@@ -935,6 +957,17 @@
    "fibres": 0,
    "sel": 6.3
   },
+  "Mozzarella au lait de bufflonne ou buflesse (\"di bufala\")": {
+   "groupe": "produits laitiers",
+   "sous_groupe": "fromages et alternatives vegetales",
+   "kcal": 260,
+   "proteines": 14.5,
+   "glucides": 0.18,
+   "lipides": 22.3,
+   "sucres": 0,
+   "fibres": 0.063,
+   "sel": 0.49
+  },
   "Mozzarella au lait de vache": {
    "groupe": "produits laitiers et assimiles",
    "sous_groupe": "fromages et assimiles",
@@ -1069,6 +1102,17 @@
    "fibres": 6.23,
    "sel": 1.18
   },
+  "Pain pour burger ou hot dog (bun), preemballe": {
+   "groupe": "produits cerealiers",
+   "sous_groupe": "pains et assimiles",
+   "kcal": 283,
+   "proteines": 8.21,
+   "glucides": 47.2,
+   "lipides": 4.9,
+   "sucres": 6.46,
+   "fibres": 3.5,
+   "sel": 1.13
+  },
   "Paprika": {
    "groupe": "aides culinaires et ingredients divers",
    "sous_groupe": "epices",
@@ -1079,6 +1123,17 @@
    "sucres": 10.3,
    "fibres": 34.9,
    "sel": 0.17
+  },
+  "Parmesan": {
+   "groupe": "produits laitiers",
+   "sous_groupe": "fromages et alternatives vegetales",
+   "kcal": 411,
+   "proteines": 31.1,
+   "glucides": 1.14,
+   "lipides": 31,
+   "sucres": 0,
+   "fibres": 0,
+   "sel": 1.57
   },
   "Pate a tartiner chocolat et noisette": {
    "groupe": "produits sucres",
@@ -1497,6 +1552,18 @@
    "sucres": 16.5,
    "fibres": 3.62,
    "sel": 0.93
+  },
+  "Tomate, sechee, a l'huile": {
+   "groupe": "fruits, legumes, legumineuses et oleagineux",
+   "sous_groupe": "legumes",
+   "kcal": 171.0,
+   "proteines": 5.06,
+   "glucides": 7.98,
+   "lipides": 13.2,
+   "sucres": 6.5,
+   "fibres": 5.8,
+   "sel": 0.67,
+   "kcal_estime": true
   },
   "Vinaigre de cidre": {
    "groupe": "aides culinaires et ingredients divers",
