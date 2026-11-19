@@ -4,7 +4,7 @@ import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer } from '../ui
 import { norm, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
 import { parPart } from '../nutrition.js';
 import { md } from '../md.js';
-import { usePhoto, envoyerPhoto } from '../photos.js';
+import { usePhoto, envoyerPhoto, envoyerCouverture } from '../photos.js';
 import { MOMENTS } from './semaine.js';
 
 const LS_FILTRE = 'yummy.filtreType';
@@ -20,7 +20,7 @@ function Image({ chemin, alt = '', classe = '' }) {
   </span>`;
 }
 
-function BoutonPhoto({ recette, classe, label, children }) {
+function BoutonPhoto({ envoyer, classe, label, children }) {
   const [envoi, setEnvoi] = useState(false);
   const choisir = async (e) => {
     const f = e.target.files && e.target.files[0];
@@ -28,7 +28,7 @@ function BoutonPhoto({ recette, classe, label, children }) {
     if (!f) return;
     setEnvoi(true);
     try {
-      await envoyerPhoto(recette, f);
+      await envoyer(f);
       store.afficher('Photo ajoutée');
     } catch (err) {
       store.afficher(err.message || 'La photo n’a pas pu être envoyée.');
@@ -49,6 +49,7 @@ export function Recettes() {
   const [type, setType] = useState(() => localStorage.getItem(LS_FILTRE) || '');
   const [tri, setTri] = useState(() => (localStorage.getItem(LS_TRI) === 'livre' ? 'livre' : 'nom'));
   const recettes = s.local.recettes.recettes;
+  const couvertures = s.local.recettes.livres || {};
   const types = useMemo(() => [...new Set(recettes.map((r) => r.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr')), [recettes]);
   const liste = useMemo(() => {
     const n = norm(q);
@@ -86,7 +87,7 @@ export function Recettes() {
     return html`<li key=${r.id} class="ligne-recette">
       ${r.photo
         ? html`<a href=${`#/recette/${r.id}`} class="vignette" tabindex="-1" aria-hidden="true"><${Image} chemin=${r.photo.mini} /></a>`
-        : html`<${BoutonPhoto} recette=${r} classe="vignette vignette-vide" label=${`Ajouter une photo de ${r.nom}`}>${Ico.plus()}<//>`}
+        : html`<${BoutonPhoto} envoyer=${(f) => envoyerPhoto(r, f)} classe="vignette vignette-vide" label=${`Ajouter une photo de ${r.nom}`}>${Ico.plus()}<//>`}
       <a href=${`#/recette/${r.id}`} class="ligne-texte">
         <span class="liste-nom">${r.nom}</span>
         <span class="liste-meta">
@@ -113,12 +114,21 @@ export function Recettes() {
       <button aria-pressed=${tri === 'livre'} onClick=${() => choisirTri('livre')}>Par livre</button>
     </div>
     ${livres
-      ? livres.map(
-          ([livre, rs]) => html`<section class="livre" key=${livre}>
-            <h2><span class="livre-nom">${livre}</span><small>${rs.length} ${rs.length > 1 ? 'recettes' : 'recette'}</small></h2>
+      ? livres.map(([livre, rs]) => {
+          const photo = couvertures[livre]?.photo;
+          const envoi = (f) => envoyerCouverture(livre, f);
+          return html`<section class="livre" key=${livre}>
+            <div class="livre-tete">
+              ${livre === SANS_LIVRE
+                ? null
+                : photo
+                  ? html`<${BoutonPhoto} envoyer=${envoi} classe="couverture" label=${`Changer la couverture de ${livre}`}><${Image} chemin=${photo.mini} /><//>`
+                  : html`<${BoutonPhoto} envoyer=${envoi} classe="couverture couverture-vide" label=${`Ajouter la couverture de ${livre}`}>${Ico.plus()}<//>`}
+              <h2><span class="livre-nom">${livre}</span><small>${rs.length} ${rs.length > 1 ? 'recettes' : 'recette'}</small></h2>
+            </div>
             <ul class="liste-recettes">${rs.map(ligne)}</ul>
-          </section>`,
-        )
+          </section>`;
+        })
       : html`<ul class="liste-recettes">${liste.map(ligne)}</ul>`}
     ${!liste.length &&
     html`<div class="vide">
@@ -155,9 +165,9 @@ export function Recette({ id, q }) {
     ${r.photo
       ? html`<figure class="photo-plat">
           <${Image} chemin=${r.photo.grande} alt=${`Photo du plat : ${r.nom}`} />
-          <${BoutonPhoto} recette=${r} classe="photo-changer" label="Changer la photo">${Ico.photo()}<//>
+          <${BoutonPhoto} envoyer=${(f) => envoyerPhoto(r, f)} classe="photo-changer" label="Changer la photo">${Ico.photo()}<//>
         </figure>`
-      : html`<${BoutonPhoto} recette=${r} classe="photo-vide" label="Ajouter une photo du plat">${Ico.plus()}<span>Ajouter une photo du plat</span><//>`}
+      : html`<${BoutonPhoto} envoyer=${(f) => envoyerPhoto(r, f)} classe="photo-vide" label="Ajouter une photo du plat">${Ico.plus()}<span>Ajouter une photo du plat</span><//>`}
     <div class=${r.photo ? 'tete-sur-photo' : ''}>
       <${Plaque} sous=${[r.type, ...(r.sources || [])].filter(Boolean).join(', ')}>${r.nom}<//>
     </div>

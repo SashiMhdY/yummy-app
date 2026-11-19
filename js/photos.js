@@ -1,6 +1,7 @@
 // Photos des plats : stockées dans le dépôt privé, lues avec la clé, gardées en cache sur l'appareil.
 import { useState, useEffect } from './vendor/htm-preact.js';
 import { store } from './store.js';
+import { slug } from './util.js';
 
 const memoire = new Map(); // chemin -> URL d'objet
 const enCours = new Map(); // chemin -> Promise
@@ -85,32 +86,49 @@ function versJpeg(img, largeur, hauteur, sx, sy, sl, sh) {
   return new Promise((res) => c.toBlob(res, 'image/jpeg', 0.8));
 }
 
-async function preparer(fichier) {
+// Vignette carrée pour les plats ; pour une couverture de livre, image entière réduite (pas de recadrage).
+async function preparer(fichier, { carre = true } = {}) {
   const { img, url } = await lireImage(fichier);
   try {
     const w = img.naturalWidth;
     const h = img.naturalHeight;
     const k = Math.min(1, 1400 / Math.max(w, h));
     const grande = await versJpeg(img, Math.round(w * k), Math.round(h * k), 0, 0, w, h);
-    const cote = Math.min(w, h);
-    const mini = await versJpeg(img, 320, 320, (w - cote) / 2, (h - cote) / 2, cote, cote);
+    let mini;
+    if (carre) {
+      const cote = Math.min(w, h);
+      mini = await versJpeg(img, 320, 320, (w - cote) / 2, (h - cote) / 2, cote, cote);
+    } else {
+      const km = Math.min(1, 320 / Math.max(w, h));
+      mini = await versJpeg(img, Math.round(w * km), Math.round(h * km), 0, 0, w, h);
+    }
     return { grande, mini };
   } finally {
     URL.revokeObjectURL(url);
   }
 }
 
-export async function envoyerPhoto(recette, fichier) {
+async function envoyer(base, fichier, message, options) {
   if (!navigator.onLine) throw new Error('Il faut du réseau pour envoyer une photo.');
-  const { grande, mini } = await preparer(fichier);
+  const { grande, mini } = await preparer(fichier, options);
   const marque = Date.now().toString(36);
-  const chemins = { grande: `photos/${recette.id}-${marque}.jpg`, mini: `photos/${recette.id}-${marque}-mini.jpg` };
+  const chemins = { grande: `${base}-${marque}.jpg`, mini: `${base}-${marque}-mini.jpg` };
   const depot = store.depot();
   for (const [k, blob] of [['grande', grande], ['mini', mini]]) {
     const octets = new Uint8Array(await blob.arrayBuffer());
-    await depot.creerBinaire(chemins[k], octets, `Photos : ${recette.nom}`);
+    await depot.creerBinaire(chemins[k], octets, message);
     await versCache(chemins[k], blob);
     memoire.set(chemins[k], URL.createObjectURL(blob));
   }
-  store.faire('recettes', 'recette.photo', { id: recette.id, photo: chemins });
+  return chemins;
+}
+
+export async function envoyerPhoto(recette, fichier) {
+  const photo = await envoyer(`photos/${recette.id}`, fichier, `Photos : ${recette.nom}`);
+  store.faire('recettes', 'recette.photo', { id: recette.id, photo });
+}
+
+export async function envoyerCouverture(livre, fichier) {
+  const photo = await envoyer(`photos/livres/${slug(livre) || 'livre'}`, fichier, `Photos : couverture de ${livre}`, { carre: false });
+  store.faire('recettes', 'livre.photo', { livre, photo });
 }
