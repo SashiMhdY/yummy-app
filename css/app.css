@@ -217,6 +217,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
   display: flex; flex-direction: column; gap: 0.15rem; width: 100%; padding: 0.75rem 0;
   border: 0; background: none; text-align: left; color: var(--encre); text-decoration: none; cursor: pointer;
 }
+.segments-tri { margin-top: 0.25rem; }
+.livre { margin: 1.25rem 0 0; }
+.livre h2 { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin: 0; padding-bottom: 0.35rem; border-bottom: 1.5px solid var(--cobalt); font-family: var(--plaque); font-weight: 800; font-size: var(--t-l); color: var(--cobalt); }
+.livre-nom { display: inline-block; min-width: 0; }
+.livre-nom::first-letter { text-transform: uppercase; }
+.livre h2 small { flex: none; font-family: var(--texte); font-weight: 400; font-size: var(--t-s); color: var(--chine); }
+.livre .liste-recettes { margin-top: 0; }
 .liste-nom { font-weight: 700; font-size: var(--t-m); }
 .liste-meta { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; color: var(--chine); font-size: var(--t-s); }
 .liste-meta > :first-child { color: var(--cobalt); font-weight: 600; }

@@ -8,6 +8,9 @@ import { usePhoto, envoyerPhoto } from '../photos.js';
 import { MOMENTS } from './semaine.js';
 
 const LS_FILTRE = 'yummy.filtreType';
+const LS_TRI = 'yummy.triRecettes';
+const SANS_LIVRE = 'Sans livre';
+const parNom = (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' });
 
 // ---------- Photos ----------
 function Image({ chemin, alt = '', classe = '' }) {
@@ -44,21 +47,55 @@ export function Recettes() {
   const s = useStore();
   const [q, setQ] = useState('');
   const [type, setType] = useState(() => localStorage.getItem(LS_FILTRE) || '');
+  const [tri, setTri] = useState(() => (localStorage.getItem(LS_TRI) === 'livre' ? 'livre' : 'nom'));
   const recettes = s.local.recettes.recettes;
   const types = useMemo(() => [...new Set(recettes.map((r) => r.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr')), [recettes]);
   const liste = useMemo(() => {
     const n = norm(q);
-    return recettes.filter((r) => {
-      if (type && r.type !== type) return false;
-      if (!n) return true;
-      const foin = norm([r.nom, r.type, ...(r.etiquettes || []), ...(r.sources || []), ...r.ingredients.map((i) => i.nom)].join(' '));
-      return n.split(/\s+/).every((m) => foin.includes(m));
-    });
+    return recettes
+      .filter((r) => {
+        if (type && r.type !== type) return false;
+        if (!n) return true;
+        const foin = norm([r.nom, r.type, ...(r.etiquettes || []), ...(r.sources || []), ...r.ingredients.map((i) => i.nom)].join(' '));
+        return n.split(/\s+/).every((m) => foin.includes(m));
+      })
+      .sort((a, b) => parNom(a.nom, b.nom));
   }, [q, type, recettes]);
+  // Par livre : une section par livre (première source de la recette), livres par ordre alphabétique.
+  const livres = useMemo(() => {
+    if (tri !== 'livre') return null;
+    const m = new Map();
+    for (const r of liste) {
+      const l = (r.sources || []).find(Boolean) || SANS_LIVRE;
+      if (!m.has(l)) m.set(l, []);
+      m.get(l).push(r);
+    }
+    return [...m].sort(([a], [b]) => (a === SANS_LIVRE) - (b === SANS_LIVRE) || parNom(a, b));
+  }, [liste, tri]);
   const choisirType = (t) => {
     const v = t === type ? '' : t;
     localStorage.setItem(LS_FILTRE, v);
     setType(v);
+  };
+  const choisirTri = (t) => {
+    localStorage.setItem(LS_TRI, t);
+    setTri(t);
+  };
+  const ligne = (r) => {
+    const pp = parPart(r, s.aliments);
+    return html`<li key=${r.id} class="ligne-recette">
+      ${r.photo
+        ? html`<a href=${`#/recette/${r.id}`} class="vignette" tabindex="-1" aria-hidden="true"><${Image} chemin=${r.photo.mini} /></a>`
+        : html`<${BoutonPhoto} recette=${r} classe="vignette vignette-vide" label=${`Ajouter une photo de ${r.nom}`}>${Ico.plus()}<//>`}
+      <a href=${`#/recette/${r.id}`} class="ligne-texte">
+        <span class="liste-nom">${r.nom}</span>
+        <span class="liste-meta">
+          <span>${r.type}</span>
+          ${r.preparation + r.cuisson > 0 && html`<span class="avec-ico">${Ico.horloge()}${duree(r.preparation + r.cuisson)}</span>`}
+          ${pp.kcal > 0 && html`<span>${nombre(pp.kcal)} kcal par part</span>`}
+        </span>
+      </a>
+    </li>`;
   };
 
   return html`<main class="vue">
@@ -71,24 +108,18 @@ export function Recettes() {
     <div class="filtres" role="group" aria-label="Filtrer par type de plat">
       ${types.map((t) => html`<button class=${`filtre${type === t ? ' actif' : ''}`} aria-pressed=${type === t} onClick=${() => choisirType(t)}>${t}</button>`)}
     </div>
-    <ul class="liste-recettes">
-      ${liste.map((r) => {
-        const pp = parPart(r, s.aliments);
-        return html`<li key=${r.id} class="ligne-recette">
-          ${r.photo
-            ? html`<a href=${`#/recette/${r.id}`} class="vignette" tabindex="-1" aria-hidden="true"><${Image} chemin=${r.photo.mini} /></a>`
-            : html`<${BoutonPhoto} recette=${r} classe="vignette vignette-vide" label=${`Ajouter une photo de ${r.nom}`}>${Ico.plus()}<//>`}
-          <a href=${`#/recette/${r.id}`} class="ligne-texte">
-            <span class="liste-nom">${r.nom}</span>
-            <span class="liste-meta">
-              <span>${r.type}</span>
-              ${r.preparation + r.cuisson > 0 && html`<span class="avec-ico">${Ico.horloge()}${duree(r.preparation + r.cuisson)}</span>`}
-              ${pp.kcal > 0 && html`<span>${nombre(pp.kcal)} kcal par part</span>`}
-            </span>
-          </a>
-        </li>`;
-      })}
-    </ul>
+    <div class="segments segments-tri" role="group" aria-label="Trier les recettes">
+      <button aria-pressed=${tri === 'nom'} onClick=${() => choisirTri('nom')}>Par nom</button>
+      <button aria-pressed=${tri === 'livre'} onClick=${() => choisirTri('livre')}>Par livre</button>
+    </div>
+    ${livres
+      ? livres.map(
+          ([livre, rs]) => html`<section class="livre" key=${livre}>
+            <h2><span class="livre-nom">${livre}</span><small>${rs.length} ${rs.length > 1 ? 'recettes' : 'recette'}</small></h2>
+            <ul class="liste-recettes">${rs.map(ligne)}</ul>
+          </section>`,
+        )
+      : html`<ul class="liste-recettes">${liste.map(ligne)}</ul>`}
     ${!liste.length &&
     html`<div class="vide">
       ${recettes.length ? html`<p>Aucune recette ne correspond à cette recherche.</p>` : html`<p>Le livre est vide.</p><p>Les recettes s’ajoutent en envoyant la photo d’une recette à Claude.</p>`}
