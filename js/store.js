@@ -77,12 +77,23 @@ const OPS = {
   recettes: {
     'recette.enregistrer'(d, { recette }) {
       const i = d.recettes.findIndex((r) => r.id === recette.id);
-      if (i >= 0) d.recettes[i] = recette;
-      else d.recettes.push(recette);
+      if (i >= 0) {
+        // le favori ne se change que par l'étoile : on garde la valeur enregistrée
+        const favori = d.recettes[i].favori;
+        d.recettes[i] = { ...recette };
+        if (favori) d.recettes[i].favori = true;
+        else delete d.recettes[i].favori;
+      } else d.recettes.push(recette);
       d.recettes.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
     },
     'recette.supprimer'(d, { id }) {
       d.recettes = d.recettes.filter((r) => r.id !== id);
+    },
+    'recette.favori'(d, { id, favori }) {
+      const r = d.recettes.find((x) => x.id === id);
+      if (!r) return;
+      if (favori) r.favori = true;
+      else delete r.favori;
     },
     'recette.photo'(d, { id, photo }) {
       const r = d.recettes.find((x) => x.id === id);
@@ -127,6 +138,7 @@ const MESSAGES = {
   'recette.enregistrer': 'Recettes : recette enregistrée',
   'recette.supprimer': 'Recettes : recette supprimée',
   'recette.photo': 'Recettes : photo ajoutée',
+  'recette.favori': 'Recettes : favori modifié',
   'livre.photo': 'Recettes : couverture de livre ajoutée',
   'profil.enregistrer': 'Profils : profil enregistré',
   'profil.supprimer': 'Profils : profil supprimé',
