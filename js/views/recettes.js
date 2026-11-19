@@ -14,6 +14,16 @@ try {
   /* stockage indisponible */
 }
 const SANS_LIVRE = 'Sans livre';
+const WEB = 'Recettes du web'; // source des recettes trouvées sur internet, présentées à part
+const TRIS = ['nom', 'livre', 'web'];
+const estWeb = (r) => (r.sources || []).find(Boolean) === WEB;
+const site = (url) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+};
 // Filtre de type gardé seulement pendant que l'app est ouverte (retour depuis une recette), jamais d'une ouverture à l'autre.
 let filtreSession = '';
 const parNom = (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' });
@@ -53,7 +63,10 @@ export function Recettes() {
   const s = useStore();
   const [q, setQ] = useState('');
   const [type, setType] = useState(filtreSession);
-  const [tri, setTri] = useState(() => (localStorage.getItem(LS_TRI) === 'livre' ? 'livre' : 'nom'));
+  const [tri, setTri] = useState(() => {
+    const v = localStorage.getItem(LS_TRI);
+    return TRIS.includes(v) ? v : 'nom';
+  });
   const recettes = s.local.recettes.recettes;
   const couvertures = s.local.recettes.livres || {};
   const types = useMemo(() => [...new Set(recettes.map((r) => r.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr')), [recettes]);
@@ -68,17 +81,19 @@ export function Recettes() {
       })
       .sort((a, b) => parNom(a.nom, b.nom));
   }, [q, type, recettes]);
+  // Par nom : tout ; par livre : sans les recettes du web ; du web : seulement elles.
+  const visibles = useMemo(() => (tri === 'web' ? liste.filter(estWeb) : tri === 'livre' ? liste.filter((r) => !estWeb(r)) : liste), [liste, tri]);
   // Par livre : une section par livre (première source de la recette), livres par ordre alphabétique.
   const livres = useMemo(() => {
     if (tri !== 'livre') return null;
     const m = new Map();
-    for (const r of liste) {
+    for (const r of visibles) {
       const l = (r.sources || []).find(Boolean) || SANS_LIVRE;
       if (!m.has(l)) m.set(l, []);
       m.get(l).push(r);
     }
     return [...m].sort(([a], [b]) => (a === SANS_LIVRE) - (b === SANS_LIVRE) || parNom(a, b));
-  }, [liste, tri]);
+  }, [visibles, tri]);
   const choisirType = (t) => {
     const v = t === type ? '' : t;
     filtreSession = v;
@@ -98,6 +113,7 @@ export function Recettes() {
         <span class="liste-nom">${r.nom}</span>
         <span class="liste-meta">
           <span>${r.type}</span>
+          ${tri === 'web' && site(r.url) && html`<span>${site(r.url)}</span>`}
           ${r.preparation + r.cuisson > 0 && html`<span class="avec-ico">${Ico.horloge()}${duree(r.preparation + r.cuisson)}</span>`}
           ${pp.kcal > 0 && html`<span>${nombre(pp.kcal)} kcal par part</span>`}
         </span>
@@ -118,6 +134,7 @@ export function Recettes() {
     <div class="segments segments-tri" role="group" aria-label="Trier les recettes">
       <button aria-pressed=${tri === 'nom'} onClick=${() => choisirTri('nom')}>Par nom</button>
       <button aria-pressed=${tri === 'livre'} onClick=${() => choisirTri('livre')}>Par livre</button>
+      <button aria-pressed=${tri === 'web'} onClick=${() => choisirTri('web')}>Du web</button>
     </div>
     ${livres
       ? livres.map(([livre, rs]) => {
@@ -135,10 +152,12 @@ export function Recettes() {
             <ul class="liste-recettes">${rs.map(ligne)}</ul>
           </section>`;
         })
-      : html`<ul class="liste-recettes">${liste.map(ligne)}</ul>`}
-    ${!liste.length &&
+      : html`<ul class="liste-recettes">${visibles.map(ligne)}</ul>`}
+    ${!visibles.length &&
     html`<div class="vide">
-      ${recettes.length ? html`<p>Aucune recette ne correspond à cette recherche.</p>` : html`<p>Le livre est vide.</p><p>Les recettes s’ajoutent en envoyant la photo d’une recette à Claude.</p>`}
+      ${tri === 'web' && !q && !type
+        ? html`<p>Aucune recette du web pour l’instant.</p><p>Envoie à Claude le lien ou une capture d’une recette trouvée en ligne.</p>`
+        : recettes.length ? html`<p>Aucune recette ne correspond à cette recherche.</p>` : html`<p>Le livre est vide.</p><p>Les recettes s’ajoutent en envoyant la photo d’une recette à Claude.</p>`}
     </div>`}
   </main>`;
 }
