@@ -5,7 +5,7 @@
 
 // À changer à chaque nouvelle version de l'app (même numéro que VERSION dans js/views/reglages.js) :
 // le téléphone détecte alors la mise à jour et affiche « Nouvelle version disponible ».
-const CACHE = 'yummy-app-1.4.0';
+const CACHE = 'yummy-app-1.4.1';
 const FICHIERS = [
   './',
   './index.html',
@@ -35,6 +35,9 @@ const FICHIERS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
+  './icons/favicon.svg',
+  './icons/favicon-32.png',
+  './favicon.ico',
 ];
 
 self.addEventListener('install', (e) => {

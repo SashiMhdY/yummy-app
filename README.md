@@ -20,7 +20,7 @@ Elle s’utilise dans un navigateur et s’installe sur iPhone comme une app (Sa
 ## Arborescence
 
 ```
-index.html, manifest.webmanifest, sw.js
+index.html, manifest.webmanifest, sw.js, favicon.ico
 css/app.css
 js/app.js            routes et écran principal
 js/store.js          état, cache local, synchronisation
