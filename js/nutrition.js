@@ -9,7 +9,7 @@ export const MACROS = [
 ];
 
 export function macrosRecette(recette, aliments) {
-  const t = { kcal: 0, proteines: 0, glucides: 0, lipides: 0, fibres: 0, manquants: [] };
+  const t = { kcal: 0, proteines: 0, glucides: 0, lipides: 0, fibres: 0, sucres: 0, sel: 0, manquants: [] };
   for (const ing of recette.ingredients || []) {
     const a = ing.aliment && aliments[ing.aliment];
     if (estEau(ing)) continue;
@@ -23,6 +23,8 @@ export function macrosRecette(recette, aliments) {
     t.glucides += (a.glucides || 0) * k;
     t.lipides += (a.lipides || 0) * k;
     t.fibres += (a.fibres || 0) * k;
+    t.sucres += (a.sucres || 0) * k;
+    t.sel += (a.sel || 0) * k;
   }
   return t;
 }
@@ -30,7 +32,55 @@ export function macrosRecette(recette, aliments) {
 export function parPart(recette, aliments) {
   const t = macrosRecette(recette, aliments);
   const p = Math.max(1, recette.portions || 1);
-  return { kcal: t.kcal / p, proteines: t.proteines / p, glucides: t.glucides / p, lipides: t.lipides / p, fibres: t.fibres / p, manquants: t.manquants };
+  return { kcal: t.kcal / p, proteines: t.proteines / p, glucides: t.glucides / p, lipides: t.lipides / p, fibres: t.fibres / p, sucres: t.sucres / p, sel: t.sel / p, manquants: t.manquants };
+}
+
+// ---------- Composition complète (table Ciqual détaillée, chargée à la demande) ----------
+let details = null;
+export function chargerDetails() {
+  details ||= fetch('./data/nutriments.json')
+    .then((r) => {
+      if (!r.ok) throw new Error('Valeurs détaillées indisponibles.');
+      return r.json();
+    })
+    .catch((e) => {
+      details = null;
+      throw e;
+    });
+  return details;
+}
+
+// Apports de référence d'un adulte (Règlement UE n° 1169/2011, annexe XIII), pour les % affichés.
+export const AR = {
+  kcal: 2000, proteines: 50, glucides: 260, sucres: 90, lipides: 70, ags: 20, sel: 6,
+  potassium: 2000, chlorure: 800, calcium: 800, phosphore: 700, magnesium: 375, fer: 14, zinc: 10, cuivre: 1,
+  manganese: 2, selenium: 55, iode: 150,
+  vita: 800, vitd: 5, vite: 12, vitk1: 75, vitc: 80, vitb1: 1.1, vitb2: 1.4, vitb3: 16, vitb5: 6, vitb6: 1.4, vitb9: 200, vitb12: 2.5,
+};
+
+// Par part, pour chaque nutriment détaillé : { valeur, couverture } ; couverture = part du poids des
+// ingrédients (reliés à Ciqual) pour lesquels la valeur est mesurée (0 à 1).
+export function detailsParPart(recette, aliments, table) {
+  const cles = table.nutriments.map((n) => n[0]);
+  const somme = cles.map(() => 0);
+  const connu = cles.map(() => 0);
+  let poids = 0;
+  for (const ing of recette.ingredients || []) {
+    if (estEau(ing) || !ing.aliment || !aliments[ing.aliment] || ing.poids == null) continue;
+    poids += ing.poids;
+    const v = table.aliments[ing.aliment] || [];
+    cles.forEach((_, i) => {
+      if (v[i] == null) return;
+      somme[i] += (v[i] * ing.poids) / 100;
+      connu[i] += ing.poids;
+    });
+  }
+  const p = Math.max(1, recette.portions || 1);
+  const r = {};
+  cles.forEach((k, i) => {
+    r[k] = { valeur: somme[i] / p, couverture: poids ? connu[i] / poids : 0 };
+  });
+  return r;
 }
 
 // ---------- Besoins journaliers d'un profil ----------

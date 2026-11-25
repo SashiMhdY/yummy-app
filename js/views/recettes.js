@@ -1,8 +1,8 @@
-import { html, useState, useMemo } from '../vendor/htm-preact.js';
+import { html, useState, useMemo, useEffect } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
 import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer, Image, Puce, MiniMacros, MACROS, niveauKcal } from '../ui.js';
 import { norm, slug, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
-import { parPart } from '../nutrition.js';
+import { parPart, chargerDetails, detailsParPart, AR } from '../nutrition.js';
 import { md } from '../md.js';
 import { usePhoto, envoyerPhoto, envoyerCouverture } from '../photos.js';
 import { MOMENTS } from './semaine.js';
@@ -71,7 +71,7 @@ function BoutonPhoto({ envoyer, classe, label, children }) {
 }
 
 // ---------- Macros d'une recette ----------
-function CarteMacros({ pp }) {
+function CarteMacros({ pp, recette }) {
   const niv = niveauKcal(pp.kcal);
   // part de l'énergie apportée par chaque macro (4 kcal/g pour protéines et glucides, 9 pour les lipides)
   const e = { proteines: pp.proteines * 4, glucides: pp.glucides * 4, lipides: pp.lipides * 9 };
@@ -96,7 +96,86 @@ function CarteMacros({ pp }) {
       </div>
     </div>`}
     ${pp.manquants.length > 0 && html`<p class="aide">Sans valeur nutritionnelle : ${pp.manquants.join(', ')}.</p>`}
+    <${DetailsNutrition} recette=${recette} pp=${pp} />
   </section>`;
+}
+
+// ---------- Toutes les valeurs nutritionnelles (panneau dépliable) ----------
+const nfDetail = (n) => {
+  if (n === 0) return '0';
+  const a = Math.abs(n);
+  const max = a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 1 : a >= 0.1 ? 2 : 3;
+  return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: max }).format(n);
+};
+const GROUPES = [
+  ['glucides', 'Glucides en détail'],
+  ['lipides', 'Lipides en détail'],
+  ['mineraux', 'Minéraux'],
+  ['vitamines', 'Vitamines'],
+  ['autres', 'Autres'],
+];
+
+function LigneNutriment({ k, libelle, valeur, unite, couverture = 1, sous }) {
+  const inconnu = couverture === 0;
+  const partiel = !inconnu && couverture < 0.8;
+  const pct = !inconnu && AR[k] ? (valeur / AR[k]) * 100 : null;
+  return html`<tr class=${sous ? 'sous' : ''}>
+    <th scope="row">${libelle}</th>
+    <td class="valeur">${inconnu ? html`<span class="non-mesure">non mesuré</span>` : html`${partiel ? html`<abbr title="Valeur non mesurée pour une partie des ingrédients : c’est un minimum">≥ </abbr>` : ''}${nfDetail(valeur)}\u202F${unite}`}</td>
+    <td class="ar">${pct != null && html`<span class="ar-barre" aria-hidden="true"><span style=${{ width: `${Math.min(100, pct)}%` }}></span></span><span class="ar-pct">${nombre(pct)} %</span>`}</td>
+  </tr>`;
+}
+
+function DetailsNutrition({ recette, pp }) {
+  const s = useStore();
+  const [ouvert, setOuvert] = useState(false);
+  const [table, setTable] = useState(null);
+  const [erreur, setErreur] = useState('');
+  useEffect(() => {
+    if (!ouvert || table) return;
+    let actif = true;
+    chargerDetails()
+      .then((t) => actif && setTable(t))
+      .catch((e) => actif && setErreur(e.message));
+    return () => {
+      actif = false;
+    };
+  }, [ouvert]);
+  const d = useMemo(() => (table ? detailsParPart(recette, s.aliments, table) : null), [table, recette, s.aliments]);
+  const ligne = ([k, lib, u]) => html`<${LigneNutriment} key=${k} k=${k} libelle=${lib} unite=${u} valeur=${d[k].valeur} couverture=${d[k].couverture} />`;
+  return html`<details class="details-nutri" onToggle=${(e) => setOuvert(e.currentTarget.open)}>
+    <summary><span>Toutes les valeurs nutritionnelles</span><span class="chevron">${Ico.droite()}</span></summary>
+    ${ouvert &&
+    (erreur
+      ? html`<p class="aide">${erreur}</p>`
+      : !d
+        ? html`<p class="aide">Chargement…</p>`
+        : html`<div class="details-corps">
+            <p class="aide">Par part. Le % compare à l’apport de référence d’un adulte (2 000 kcal par jour).</p>
+            <table class="tableau-nutri">
+              <caption>Valeurs essentielles</caption>
+              <thead><tr><th scope="col">Nutriment</th><th scope="col">Par part</th><th scope="col">% AR</th></tr></thead>
+              <tbody>
+                <${LigneNutriment} k="kcal" libelle=${html`Énergie <small>(${nombre(pp.kcal * 4.184)}\u202FkJ)</small>`} valeur=${pp.kcal} unite="kcal" />
+                <${LigneNutriment} k="lipides" libelle="Lipides" valeur=${pp.lipides} unite="g" />
+                <${LigneNutriment} k="ags" libelle="dont acides gras saturés" valeur=${d.ags.valeur} couverture=${d.ags.couverture} unite="g" sous />
+                <${LigneNutriment} k="glucides" libelle="Glucides" valeur=${pp.glucides} unite="g" />
+                <${LigneNutriment} k="sucres" libelle="dont sucres" valeur=${pp.sucres} unite="g" sous />
+                <${LigneNutriment} k="fibres" libelle="Fibres" valeur=${pp.fibres} unite="g" />
+                <${LigneNutriment} k="proteines" libelle="Protéines" valeur=${pp.proteines} unite="g" />
+                <${LigneNutriment} k="sel" libelle="Sel" valeur=${pp.sel} unite="g" />
+              </tbody>
+            </table>
+            ${GROUPES.map(([g, titre]) => {
+              const ns = table.nutriments.filter((n) => n[3] === g && !(g === 'glucides' && n[0] === 'sucres') && !(g === 'lipides' && n[0] === 'ags'));
+              return html`<table class="tableau-nutri" key=${g}>
+                <caption>${titre}</caption>
+                <tbody>${ns.map(ligne)}</tbody>
+              </table>`;
+            })}
+            <p class="aide note">Source : ANSES, table Ciqual 2025. « ≥ » : la valeur n’est pas mesurée pour une partie des ingrédients, c’est donc un minimum. Les ingrédients sans correspondance Ciqual ne sont pas comptés.</p>
+          </div>`)}
+  </details>`;
 }
 
 // ---------- Liste ----------
@@ -281,7 +360,7 @@ export function Recette({ id, q }) {
       ${r.difficulte && html`<li><span class="fait-ico">${Ico.etoile()}</span><span><small>Difficulté</small><strong>${r.difficulte}</strong></span></li>`}
     </ul>
 
-    <${CarteMacros} pp=${pp} />
+    <${CarteMacros} pp=${pp} recette=${r} />
 
     <button class="btn btn-large" onClick=${() => setPlanifier(true)}>${Ico.semaine()}<span>Planifier ce plat</span></button>
 
