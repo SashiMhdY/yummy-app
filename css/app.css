@@ -613,3 +613,32 @@ input:focus-visible + .case { outline: 2px solid var(--cobalt); outline-offset: 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Toutes les valeurs nutritionnelles ---------- */
+.details-nutri { margin-top: 0.9rem; border-top: 1px solid #EDF0F4; }
+.details-nutri summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  min-height: 2.9rem; margin: 0.5rem 0 0; padding: 0 0.4rem 0 0.9rem; border-radius: 999px;
+  background: var(--cobalt-pale); color: var(--cobalt); font-weight: 700; cursor: pointer; list-style: none;
+}
+.details-nutri summary::-webkit-details-marker { display: none; }
+.details-nutri summary .chevron { display: grid; place-items: center; width: 2rem; height: 2rem; transition: transform 0.2s ease; }
+.details-nutri[open] summary .chevron { transform: rotate(90deg); }
+.details-corps > .aide:first-child { margin: 0.75rem 0 0.25rem; }
+.tableau-nutri { width: 100%; margin-top: 0.9rem; border-collapse: collapse; font-size: var(--t-s); }
+.tableau-nutri caption { padding: 0 0 0.3rem; text-align: left; font-weight: 700; font-size: var(--t-m); color: var(--encre); }
+.tableau-nutri thead th { padding: 0.25rem 0; color: var(--chine); font-size: var(--t-xs); font-weight: 600; text-align: right; border-bottom: 1.5px solid var(--encre); }
+.tableau-nutri thead th:first-child { text-align: left; }
+.tableau-nutri tbody th { padding: 0.45rem 0.5rem 0.45rem 0; text-align: left; font-weight: 600; }
+.tableau-nutri td { padding: 0.45rem 0; text-align: right; white-space: nowrap; vertical-align: middle; }
+.tableau-nutri tbody tr { border-bottom: 1px solid #EDF0F4; }
+.tableau-nutri tr.sous th { padding-left: 0.9rem; font-weight: 400; color: var(--chine); }
+.tableau-nutri .valeur { font-weight: 700; padding-right: 0.6rem; }
+.tableau-nutri .non-mesure { font-weight: 400; color: #9AA3B2; font-size: var(--t-xs); }
+.tableau-nutri abbr { text-decoration: none; color: var(--chine); font-weight: 600; }
+.tableau-nutri .ar { width: 5.25rem; }
+.ar-barre { display: inline-block; width: 2.4rem; height: 0.4rem; margin-right: 0.35rem; border-radius: 999px; background: #EDF0F4; overflow: hidden; vertical-align: middle; }
+.ar-barre span { display: block; height: 100%; border-radius: inherit; background: var(--cobalt); }
+.ar-pct { display: inline-block; min-width: 2.4rem; color: var(--chine); font-size: var(--t-xs); }
+@media (prefers-reduced-motion: reduce) { .details-nutri summary .chevron { transition: none; } }
+.tableau-nutri tbody th small { font-weight: 400; color: var(--chine); font-size: var(--t-xs); }
