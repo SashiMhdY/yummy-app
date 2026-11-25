@@ -1,6 +1,6 @@
 import { html, useState, useMemo } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
-import { useStore, Plaque, Barre, Feuille, Ico } from '../ui.js';
+import { useStore, Plaque, Barre, Feuille, Ico, Puce } from '../ui.js';
 import { addDays, toISO, fromISO, jourLong, jourMois, aujourdhui, nombre, uid } from '../util.js';
 import { parPart, besoins, ACTIVITES } from '../nutrition.js';
 import { MOMENTS } from './semaine.js';
@@ -102,7 +102,7 @@ function Fiche({ profil, date, setDate, titreJour, repas, onModifier }) {
       ${NUTRIMENTS.map(([k, lib, unite]) => {
         const cible = b[k];
         if (cible == null) return null;
-        return html`<${Jauge} key=${k} libelle=${lib} unite=${unite} valeur=${apports[k]} cible=${cible} />`;
+        return html`<${Jauge} key=${k} k=${k} libelle=${lib} unite=${unite} valeur=${apports[k]} cible=${cible} />`;
       })}
     </ul>
 
@@ -139,15 +139,16 @@ function Fiche({ profil, date, setDate, titreJour, repas, onModifier }) {
   </section>`;
 }
 
-function Jauge({ libelle, unite, valeur, cible }) {
+function Jauge({ k, libelle, unite, valeur, cible }) {
   const plage = typeof cible === 'object' ? cible : null;
   const ref = plage ? (plage.min + plage.max) / 2 : cible;
   const pct = ref ? (valeur / ref) * 100 : 0;
   const ECHELLE = 130; // la barre va jusqu'à 130 % du repère
   const w = (x) => `${Math.min(100, (x / ECHELLE) * 100)}%`;
   const texteCible = plage ? `${nombre(plage.min)} à ${nombre(plage.max)} ${unite}` : `${nombre(ref)} ${unite}`;
-  return html`<li class=${`jauge${pct > 100 ? ' depasse' : ''}`}>
+  return html`<li class=${`jauge m-${k}${pct > 100 ? ' depasse' : ''}`}>
     <div class="jauge-tete">
+      <${Puce} k=${k} />
       <span class="jauge-nom">${libelle}</span>
       <span class="jauge-pct">${nombre(pct)} %</span>
     </div>

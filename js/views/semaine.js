@@ -1,6 +1,6 @@
 import { html, useState, useMemo } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
-import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer } from '../ui.js';
+import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer, Image, Puce } from '../ui.js';
 import { lundi, addDays, toISO, fromISO, semaineISO, plageSemaine, jourCourt, jourLong, aujourdhui, nombre, norm, uid, duree } from '../util.js';
 import { parPart } from '../nutrition.js';
 
@@ -52,6 +52,7 @@ export function Semaine({ q }) {
                   ${(j[m] || []).map((e) => {
                     const r = e.r && parId.get(e.r);
                     return html`<button class="entree" key=${e.id} onClick=${() => setEdition({ date: iso, moment: m, entree: e })}>
+                      ${r?.photo ? html`<span class="entree-vignette"><${Image} chemin=${r.photo.mini} /></span>` : html`<span class="entree-vignette entree-vignette-vide">${Ico.recettes()}</span>`}
                       <span class="entree-nom">${r ? r.nom : e.t || 'Recette supprimée'}</span>
                       ${r && html`<span class="parts">${e.p} ${e.p > 1 ? 'parts' : 'part'}</span>`}
                     </button>`;
@@ -62,7 +63,7 @@ export function Semaine({ q }) {
                 </div>
               </div>`,
             )}
-            ${kcal > 0 && html`<p class="jour-kcal">${nombre(kcal)} kcal par personne</p>`}
+            ${kcal > 0 && html`<p class="jour-kcal"><${Puce} k="kcal" petite /><span><strong>${nombre(kcal)} kcal</strong> par personne</span></p>`}
           </div>
         </li>`;
       })}
