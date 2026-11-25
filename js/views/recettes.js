@@ -1,6 +1,6 @@
 import { html, useState, useMemo } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
-import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer } from '../ui.js';
+import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer, Image, Puce, MiniMacros, MACROS, niveauKcal } from '../ui.js';
 import { norm, slug, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
 import { parPart } from '../nutrition.js';
 import { md } from '../md.js';
@@ -47,12 +47,6 @@ let filtreSession = '';
 const parNom = (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' });
 
 // ---------- Photos ----------
-function Image({ chemin, alt = '', classe = '' }) {
-  const { url, echec } = usePhoto(chemin);
-  return html`<span class=${`image ${classe}${url ? ' prete' : ''}`}>
-    ${url ? html`<img src=${url} alt=${alt} decoding="async" />` : echec ? html`<span class="image-echec">Photo indisponible</span>` : null}
-  </span>`;
-}
 
 function BoutonPhoto({ envoyer, classe, label, children }) {
   const [envoi, setEnvoi] = useState(false);
@@ -74,6 +68,35 @@ function BoutonPhoto({ envoyer, classe, label, children }) {
     <input type="file" accept="image/*" class="masque" onChange=${choisir} disabled=${envoi} aria-label=${label} />
     ${envoi ? html`<span class="envoi-texte">Envoi…</span>` : children}
   </label>`;
+}
+
+// ---------- Macros d'une recette ----------
+function CarteMacros({ pp }) {
+  const niv = niveauKcal(pp.kcal);
+  // part de l'énergie apportée par chaque macro (4 kcal/g pour protéines et glucides, 9 pour les lipides)
+  const e = { proteines: pp.proteines * 4, glucides: pp.glucides * 4, lipides: pp.lipides * 9 };
+  const tot = e.proteines + e.glucides + e.lipides;
+  return html`<section class="carte carte-macros" aria-labelledby="titre-macros">
+    <div class="carte-tete">
+      <h2 id="titre-macros">Par part</h2>
+      ${niv && html`<span class=${`niveau niveau-${niv[0]}`}><span class="niveau-point"></span>${niv[1]}</span>`}
+    </div>
+    <ul class="macros">
+      ${MACROS.map(([k, lib, u]) => (k === 'fibres' && !(pp.fibres > 0)) ? null : html`<li class=${`macro m-${k}`} key=${k}>
+        <${Puce} k=${k} />
+        <span class="macro-texte"><strong>${nombre(pp[k])}<small>${u === 'g' ? '\u202Fg' : '\u202Fkcal'}</small></strong><span>${lib}</span></span>
+      </li>`)}
+    </ul>
+    ${tot > 0 && html`<div class="repartition" role="img" aria-label=${`Énergie : ${nombre((e.proteines / tot) * 100)} % protéines, ${nombre((e.glucides / tot) * 100)} % glucides, ${nombre((e.lipides / tot) * 100)} % lipides`}>
+      <div class="repartition-barre">
+        ${['proteines', 'glucides', 'lipides'].map((k) => html`<span class=${`m-${k}`} style=${{ width: `${(e[k] / tot) * 100}%` }}></span>`)}
+      </div>
+      <div class="repartition-legende" aria-hidden="true">
+        ${['proteines', 'glucides', 'lipides'].map((k) => html`<span class=${`m-${k}`}><i></i>${nombre((e[k] / tot) * 100)} % ${MACROS.find((m) => m[0] === k)[1].toLowerCase()}</span>`)}
+      </div>
+    </div>`}
+    ${pp.manquants.length > 0 && html`<p class="aide">Sans valeur nutritionnelle : ${pp.manquants.join(', ')}.</p>`}
+  </section>`;
 }
 
 // ---------- Liste ----------
@@ -151,8 +174,8 @@ export function Recettes() {
           <span>${r.type}</span>
           ${tri === 'web' && site(r.url) && html`<span>${site(r.url)}</span>`}
           ${r.preparation + r.cuisson > 0 && html`<span class="avec-ico">${Ico.horloge()}${duree(r.preparation + r.cuisson)}</span>`}
-          ${pp.kcal > 0 && html`<span>${nombre(pp.kcal)} kcal par part</span>`}
         </span>
+        ${pp.kcal > 0 && html`<${MiniMacros} pp=${pp} />`}
       </a>
       <${Etoile} recette=${r} />
     </li>`;
@@ -252,28 +275,17 @@ export function Recette({ id, q }) {
       <${Plaque} sous=${[r.type, ...(r.sources || [])].filter(Boolean).join(', ')}>${r.nom}<//>
     </div>
 
-    <dl class="faits">
-      ${r.preparation > 0 && html`<div><dt>Préparation</dt><dd>${duree(r.preparation)}</dd></div>`}
-      <div><dt>Cuisson</dt><dd>${r.cuisson ? duree(r.cuisson) : 'aucune'}</dd></div>
-      ${r.difficulte && html`<div><dt>Difficulté</dt><dd>${r.difficulte}</dd></div>`}
-    </dl>
+    <ul class="faits">
+      ${r.preparation > 0 && html`<li><span class="fait-ico">${Ico.toque()}</span><span><small>Préparation</small><strong>${duree(r.preparation)}</strong></span></li>`}
+      <li><span class="fait-ico">${Ico.horloge()}</span><span><small>Cuisson</small><strong>${r.cuisson ? duree(r.cuisson) : 'aucune'}</strong></span></li>
+      ${r.difficulte && html`<li><span class="fait-ico">${Ico.etoile()}</span><span><small>Difficulté</small><strong>${r.difficulte}</strong></span></li>`}
+    </ul>
 
-    <section class="bloc">
-      <h2>Par part</h2>
-      <table class="macros">
-        <tbody><tr>
-          <td><strong>${nombre(pp.kcal)}</strong> kcal</td>
-          <td><strong>${nombre(pp.proteines)} g</strong> protéines</td>
-          <td><strong>${nombre(pp.glucides)} g</strong> glucides</td>
-          <td><strong>${nombre(pp.lipides)} g</strong> lipides</td>
-        </tr></tbody>
-      </table>
-      ${pp.manquants.length > 0 && html`<p class="aide">Sans valeur nutritionnelle : ${pp.manquants.join(', ')}.</p>`}
-    </section>
+    <${CarteMacros} pp=${pp} />
 
     <button class="btn btn-large" onClick=${() => setPlanifier(true)}>${Ico.semaine()}<span>Planifier ce plat</span></button>
 
-    <section class="bloc">
+    <section class="bloc carte">
       <div class="bloc-tete">
         <h2>Ingrédients</h2>
         <${Compteur} valeur=${parts} onChange=${setParts} label="Nombre de parts" />
@@ -292,7 +304,7 @@ export function Recette({ id, q }) {
     ${r.intro && html`<section class="bloc texte" dangerouslySetInnerHTML=${{ __html: md(r.intro) }}></section>`}
 
     ${r.etapes &&
-    html`<section class="bloc texte">
+    html`<section class="bloc carte texte">
       <h2>Préparation</h2>
       <div dangerouslySetInnerHTML=${{ __html: md(r.etapes) }}></div>
     </section>`}

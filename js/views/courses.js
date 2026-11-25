@@ -1,6 +1,6 @@
 import { html, useState, useMemo } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
-import { useStore, Plaque, Barre, Ico, naviguer } from '../ui.js';
+import { useStore, Plaque, Barre, Ico, naviguer, PuceRayon } from '../ui.js';
 import { lundi, addDays, toISO, fromISO, semaineISO, plageSemaine, cleSemaine, quantite, uid } from '../util.js';
 import { listeCourses, RAYONS } from '../nutrition.js';
 
@@ -98,14 +98,14 @@ export function Courses({ q }) {
       .filter(([id, , l]) => l.length && id !== 'placard')
       .map(
         ([id, lib, l]) => html`<section class="rayon" key=${id}>
-          <h2>${lib}</h2>
+          <h2><${PuceRayon} id=${id} /><span>${lib}</span><span class="rayon-nb" aria-hidden="true">${l.filter((a) => !coches[a.cle]).length || ''}</span></h2>
           <ul>${l.map(ligneArticle)}</ul>
         </section>`,
       )}
 
     ${extras.length > 0 &&
     html`<section class="rayon">
-      <h2>Ajouts</h2>
+      <h2><${PuceRayon} id="ajouts" /><span>Ajouts</span></h2>
       <ul>
         ${extras.map((x) => ligne({ cle: `x:${x.id}`, nom: x.nom, retirer: () => store.faire('courses', 'extra.retirer', { semaine, id: x.id }) }))}
       </ul>
@@ -116,7 +116,7 @@ export function Courses({ q }) {
       if (!placard.length) return null;
       const reste = placard.filter((a) => !coches[a.cle]).length;
       return html`<details class="rayon rayon-placard">
-        <summary><h2>Sel, poivre et épices</h2><span>${reste ? `${reste} à vérifier` : 'tout est là'}</span></summary>
+        <summary><h2><${PuceRayon} id="placard" /><span>Sel, poivre et épices</span></h2><span>${reste ? `${reste} à vérifier` : 'tout est là'}</span></summary>
         <ul>${placard.map(ligneArticle)}</ul>
       </details>`;
     })()}

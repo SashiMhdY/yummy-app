@@ -5,7 +5,7 @@
 
 // À changer à chaque nouvelle version de l'app (même numéro que VERSION dans js/views/reglages.js) :
 // le téléphone détecte alors la mise à jour et affiche « Nouvelle version disponible ».
-const CACHE = 'yummy-app-1.4.1';
+const CACHE = 'yummy-app-1.5.0';
 const FICHIERS = [
   './',
   './index.html',

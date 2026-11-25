@@ -17,6 +17,17 @@
   --cobalt-pale: #E2E8F5;
   --tomate: #B9332A;
   --jaune: #F1C232;
+  --fond: #EEF1F5;
+  --ombre: 0 1px 2px rgba(24, 32, 46, 0.06), 0 3px 10px rgba(24, 32, 46, 0.05);
+  --rayon: 1rem;
+
+  /* couleurs des macros : picto foncé sur pastille claire */
+  --kcal: #D9480F;      --kcal-pale: #FFEADB;
+  --prot: #C2255C;      --prot-pale: #FCE4EC;
+  --gluc: #B7791F;      --gluc-pale: #FDF1D3;
+  --lip: #0C7C8C;       --lip-pale: #DDF3F5;
+  --fib: #2B8A3E;       --fib-pale: #E3F4E6;
+  --vert: #2B8A3E;      --orange: #E8890C;     --rouge: #D63B2F;
 
   --texte: 'Sofia Sans', system-ui, -apple-system, sans-serif;
   --plaque: 'Sofia Plaque', 'Sofia Sans', system-ui, sans-serif;
@@ -37,7 +48,7 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--email);
+  background: var(--fond);
   color: var(--encre);
   font-family: var(--texte);
   font-size: var(--t-m);
@@ -73,12 +84,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
   line-height: 1.1;
   box-shadow:
     inset 0 0 0 4px var(--cobalt),
-    inset 0 0 0 6px var(--email),
+    inset 0 0 0 6px var(--fond),
     0 1px 0 var(--cobalt-sombre),
     0 2px 6px rgba(20, 44, 105, 0.18);
   overflow-wrap: anywhere;
 }
-.plaque-grande { font-size: var(--t-xxl); padding: 0.5rem 1.6rem 0.55rem; border-radius: 1rem; box-shadow: inset 0 0 0 6px var(--cobalt), inset 0 0 0 9px var(--email), 0 2px 0 var(--cobalt-sombre), 0 4px 14px rgba(20, 44, 105, 0.22); }
+.plaque-grande { font-size: var(--t-xxl); padding: 0.5rem 1.6rem 0.55rem; border-radius: 1rem; box-shadow: inset 0 0 0 6px var(--cobalt), inset 0 0 0 9px var(--fond), 0 2px 0 var(--cobalt-sombre), 0 4px 14px rgba(20, 44, 105, 0.22); }
 .plaque-sous { margin: 0.5rem 0 0; color: var(--chine); font-size: var(--t-s); }
 
 /* ---------- Barre du haut ---------- */
@@ -286,19 +297,10 @@ legend { padding: 0; font-weight: 700; font-size: var(--t-l); }
 .apercu span { font-size: var(--t-s); }
 
 /* ---------- Recette ---------- */
-.faits { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; margin: 0 0 1.25rem; }
-.faits div { display: flex; flex-direction: column; }
-.faits dt { color: var(--chine); font-size: var(--t-xs); }
-.faits dd { margin: 0; font-weight: 700; }
 .bloc { margin: 1.5rem 0; }
 .bloc > h2, .bloc-tete h2 { font-size: var(--t-l); font-weight: 700; margin-bottom: 0.6rem; }
 .bloc-tete { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
 .bloc-tete h2 { margin: 0; }
-.macros { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.macros td { padding: 0.55rem 0.4rem; vertical-align: top; color: var(--chine); font-size: var(--t-xs); line-height: 1.25; border-left: 1px solid var(--trait); }
-.macros td:first-child { border-left: 0; padding-left: 0; }
-.macros strong { display: block; color: var(--encre); font-size: var(--t-l); font-family: var(--plaque); font-weight: 800; }
-.macros td:first-child strong { color: var(--cobalt); }
 .ingredients { list-style: none; margin: 0; padding: 0; }
 .ingredients li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.55rem 0; border-bottom: 1px dotted #BFC8D6; }
 .ing-qte { flex: none; font-weight: 700; text-align: right; }
@@ -445,6 +447,162 @@ input:focus-visible + .case { outline: 2px solid var(--cobalt); outline-offset: 
 .vue-accueil { padding-top: calc(env(safe-area-inset-top) + 3rem); padding-bottom: 3rem; }
 .vue-accueil .plaque-zone { margin-bottom: 1.5rem; }
 .accroche { font-size: var(--t-l); line-height: 1.35; margin: 0 0 1rem; max-width: 28rem; }
+
+/* ==========================================================
+   Cartes claires, pastilles colorées et pictos
+   ========================================================== */
+.carte { padding: 1rem; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.carte > h2, .carte .bloc-tete h2, .carte-tete h2 { font-size: var(--t-l); font-weight: 700; margin: 0; }
+.carte-tete { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.85rem; }
+
+/* pastilles rondes */
+.puce { flex: none; display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px; }
+.puce .ico { width: 1.35rem; height: 1.35rem; stroke-width: 1.9; }
+.puce-petite { width: 1.35rem; height: 1.35rem; }
+.puce-petite .ico { width: 0.85rem; height: 0.85rem; stroke-width: 2.2; }
+.m-kcal { --c: var(--kcal); --c-pale: var(--kcal-pale); }
+.m-proteines { --c: var(--prot); --c-pale: var(--prot-pale); }
+.m-glucides { --c: var(--gluc); --c-pale: var(--gluc-pale); }
+.m-lipides { --c: var(--lip); --c-pale: var(--lip-pale); }
+.m-fibres { --c: var(--fib); --c-pale: var(--fib-pale); }
+.puce[class*='m-'], .m-kcal .puce, .m-proteines .puce, .m-glucides .puce, .m-lipides .puce, .m-fibres .puce { background: var(--c-pale); color: var(--c); }
+
+/* repère d'énergie par part */
+.niveau { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.7rem 0.25rem 0.55rem; border-radius: 999px; font-size: var(--t-xs); font-weight: 700; }
+.niveau-point { width: 0.65rem; height: 0.65rem; border-radius: 999px; background: currentColor; }
+.niveau-leger { background: #E3F4E6; color: var(--vert); }
+.niveau-moyen { background: #FFF0D9; color: #B76400; }
+.niveau-copieux { background: #FDE6E3; color: var(--rouge); }
+
+/* fiche recette : macros */
+.carte-macros { margin: 0 0 1rem; }
+.macros { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.macro { display: flex; align-items: center; gap: 0.65rem; padding: 0.6rem 0.7rem; border-radius: 0.8rem; background: #F6F8FA; }
+.macro-texte { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.macro-texte strong { font-family: var(--plaque); font-weight: 800; font-size: var(--t-xl); line-height: 1; color: var(--encre); }
+.macro-texte strong small { font-family: var(--texte); font-size: var(--t-s); font-weight: 700; color: var(--chine); }
+.macro-texte > span { color: var(--chine); font-size: var(--t-xs); font-weight: 600; }
+.macro.m-kcal { grid-column: span 2; background: var(--kcal-pale); }
+.macro.m-kcal strong { color: var(--c); font-size: 2.4rem; }
+.macro.m-kcal .puce { width: 3rem; height: 3rem; background: var(--blanc); }
+.macro.m-kcal .puce .ico { width: 1.6rem; height: 1.6rem; }
+.macro:last-child:nth-child(even) { grid-column: span 2; }
+.repartition { margin-top: 0.9rem; }
+.repartition-barre { display: flex; gap: 3px; height: 0.6rem; border-radius: 999px; overflow: hidden; }
+.repartition-barre span { display: block; background: var(--c); min-width: 3px; }
+.repartition-legende { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; margin-top: 0.45rem; color: var(--chine); font-size: var(--t-xs); }
+.repartition-legende span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.repartition-legende i { width: 0.55rem; height: 0.55rem; border-radius: 999px; background: var(--c); }
+.carte-macros .aide { margin: 0.75rem 0 0; }
+
+/* fiche recette : temps */
+.faits { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; padding: 0; }
+.faits li { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem 0.4rem 0.4rem; border-radius: 999px; background: var(--blanc); box-shadow: var(--ombre); }
+.faits li > span:last-child { display: flex; flex-direction: column; line-height: 1.15; }
+.faits small { color: var(--chine); font-size: 0.75rem; }
+.faits strong { font-size: var(--t-s); }
+.fait-ico { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 999px; background: var(--cobalt-pale); color: var(--cobalt); }
+.fait-ico .ico { width: 1.1rem; height: 1.1rem; }
+.vue-recette .bloc.carte { margin: 1rem 0; }
+.vue-recette .btn-large { border-radius: 0.9rem; box-shadow: 0 2px 8px rgba(29, 60, 140, 0.25); }
+.carte .ingredients li:last-child { border-bottom: 0; }
+.ingredients li { border-bottom: 1px solid #EDF0F4; }
+.photo-plat { border-radius: 1.1rem; box-shadow: var(--ombre); }
+
+/* listes de recettes en cartes */
+.liste-recettes { display: flex; flex-direction: column; gap: 0.6rem; }
+.liste-recettes li + li { border-top: 0; }
+.liste-recettes .ligne-recette { padding: 0.6rem 0.25rem 0.6rem 0.6rem; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.liste-recettes a.ligne-texte { padding: 0.1rem 0; gap: 0.3rem; }
+.liste-recettes .vignette, .vignette { width: 4.5rem; height: 4.5rem; border-radius: 0.75rem; }
+.liste-recettes .vignette-vide { width: 4.5rem; height: 4.5rem; }
+.liste-nom { line-height: 1.25; }
+.liste-meta { font-size: var(--t-xs); gap: 0.25rem 0.75rem; }
+.liste-meta > :first-child { padding: 0 0.5rem; border-radius: 999px; background: var(--cobalt-pale); }
+.mini-macros { display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; font-size: var(--t-xs); font-weight: 700; color: var(--encre); }
+.mini-macro { position: relative; display: inline-flex; align-items: center; gap: 0.15rem; white-space: nowrap; }
+.mini-macro .puce-petite { width: auto; height: auto; background: none; }
+.mini-macro .puce-petite .ico { width: 1rem; height: 1rem; }
+.mini-macro.m-kcal { color: var(--kcal); }
+.livre .liste-recettes { margin-top: 0.6rem; }
+.livre-tete { border-bottom: 0; padding: 0.6rem; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.livre { margin-top: 0.75rem; }
+
+/* champs et filtres plus doux */
+.recherche { border-color: transparent; border-radius: 999px; box-shadow: var(--ombre); }
+.filtre { border-color: transparent; box-shadow: var(--ombre); }
+.segments { border: 0; padding: 0.25rem; gap: 0.25rem; border-radius: 999px; background: #E2E6EC; }
+.segments button { border-radius: 999px; background: transparent; color: var(--chine); min-height: 2.35rem; }
+.segments button + button { border-left: 0; }
+.segments button[aria-pressed='true'] { background: var(--blanc); color: var(--cobalt); box-shadow: 0 1px 3px rgba(24, 32, 46, 0.15); }
+
+/* semaine en cartes */
+.jours { display: flex; flex-direction: column; gap: 0.7rem; }
+.jour { padding: 0.8rem 0.8rem 0.8rem 0.25rem; border-top: 0; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.jour-date { border-left-width: 4px; border-radius: 0 3px 3px 0; }
+.jour-auj { box-shadow: 0 0 0 2px var(--jaune), var(--ombre); }
+.jour-passe { background: #F7F8FA; box-shadow: none; }
+.entree { gap: 0.6rem; padding: 0.3rem 0.6rem 0.3rem 0.3rem; border: 0; border-radius: 0.75rem; background: #F4F6F9; }
+.entree .entree-nom { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; font-size: var(--t-s); }
+.jour { gap: 0.5rem; }
+.entree-vignette { flex: none; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 0.55rem; overflow: hidden; background: #E4E9F0; }
+.entree-vignette-vide { color: var(--chine); }
+.entree-vignette-vide .ico { width: 1.1rem; height: 1.1rem; }
+.parts { padding: 0.05rem 0.45rem; font-size: 0.75rem; border-radius: 999px; background: var(--blanc); font-weight: 600; }
+.ajouter { border-color: #C9D2DF; border-radius: 0.75rem; }
+.ajouter-discret { border-color: transparent; }
+.jour-kcal { display: flex; align-items: center; gap: 0.4rem; margin: 0.35rem 0 0 3rem; }
+.jour-kcal strong { color: var(--kcal); }
+
+/* courses */
+.rayon { padding: 0.75rem 1rem 0.25rem; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.rayon + .rayon, .rayon { margin-top: 0.8rem; }
+.rayon h2 { display: flex; align-items: center; gap: 0.6rem; font-size: var(--t-l); }
+.rayon h2 .puce { width: 2.25rem; height: 2.25rem; }
+.rayon h2 > span:nth-child(2) { flex: 1; }
+.rayon-nb { min-width: 1.6rem; padding: 0 0.45rem; border-radius: 999px; background: var(--cobalt-pale); color: var(--cobalt); font-family: var(--texte); font-size: var(--t-xs); font-weight: 700; text-align: center; }
+.rayon-nb:empty { display: none; }
+.rayon .article:last-child { border-bottom: 0; }
+.article { border-bottom-color: #EDF0F4; }
+.case { border-radius: 999px; }
+.rayon-placard summary h2 { margin: 0; }
+.panier { padding: 0.8rem 1rem; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.r-fruits-legumes { background: #E3F4E6; color: #2B8A3E; }
+.r-boulangerie { background: #FDF1D3; color: #A8651A; }
+.r-boucherie { background: #FCE4EC; color: #C2255C; }
+.r-charcuterie { background: #FDE6E3; color: #C0392B; }
+.r-frais { background: #DDF3F5; color: #0C7C8C; }
+.r-cremerie { background: #E2E8F5; color: #1D3C8C; }
+.r-fromages { background: #FFF4C7; color: #9A7400; }
+.r-epicerie { background: #F1E9DF; color: #8A5A2B; }
+.r-epicerie-sucree { background: #FBE7F3; color: #A61E73; }
+.r-boissons { background: #E3EEFB; color: #1C6FC2; }
+.r-placard { background: #ECEEF2; color: #586377; }
+.r-autres, .r-ajouts { background: #ECEEF2; color: #586377; }
+
+/* profils : jauges en carte, couleur par macro */
+.jauges { display: flex; flex-direction: column; gap: 0.6rem; }
+.jauge { padding: 0.8rem 1rem; border-bottom: 0; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.jauge-tete { align-items: center; gap: 0.7rem; }
+.jauge-tete .jauge-nom { flex: 1; }
+.jauge-pct { color: var(--c, var(--cobalt)); }
+.jauge-rempli { background: var(--c, var(--cobalt)); }
+.depasse .jauge-rempli { background: var(--c, var(--cobalt-sombre)); filter: saturate(1.2) brightness(0.85); }
+.jauge-plage { background: color-mix(in srgb, var(--c, #1D3C8C) 18%, transparent); border-color: color-mix(in srgb, var(--c, #1D3C8C) 50%, transparent); }
+.jauge-barre { background: #EDF0F4; }
+.jauge-detail { padding-left: 3.2rem; }
+.jauge-barre { margin-left: 3.2rem; }
+.repas-profil { padding: 0.25rem 1rem; border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre); }
+.repas-profil li:last-child { border-bottom: 0; }
+
+/* onglets : pastille derrière l'onglet actif */
+.onglet .ico { padding: 0.2rem 0.9rem; box-sizing: content-box; border-radius: 999px; transition: background 0.15s; }
+.onglet.actif .ico { background: var(--cobalt-pale); }
+.onglet.actif::before { display: none; }
+.onglets { border-top: 0; box-shadow: 0 -1px 0 rgba(24, 32, 46, 0.06), 0 -4px 16px rgba(24, 32, 46, 0.05); }
+
+.vide { border-color: #C9D2DF; background: rgba(255, 255, 255, 0.6); border-radius: var(--rayon); }
+.feuille, .feuille-tete { background: var(--fond); }
 
 @media (min-width: 48rem) {
   .plaque { font-size: 2.25rem; }
