@@ -18,6 +18,7 @@ const vide = () => ({
   portions: 4,
   preparation: 0,
   cuisson: 0,
+  repos: 0,
   difficulte: '',
   allergenes: '',
   ingredients: [],
@@ -80,6 +81,8 @@ export function Edition({ id }) {
     r.portions = Math.max(1, Number(r.portions) || 1);
     r.preparation = Number(r.preparation) || 0;
     r.cuisson = Number(r.cuisson) || 0;
+    r.repos = Number(r.repos) || 0;
+    if (!r.repos) delete r.repos; // champ facultatif : absent des recettes sans temps de repos
     r.etiquettes = f._etiquettes.split(',').map((x) => x.trim()).filter(Boolean);
     r.sources = f._source.split(',').map((x) => x.trim()).filter(Boolean);
     r.ingredients = f.ingredients
@@ -145,6 +148,10 @@ export function Edition({ id }) {
         <label class="champ">
           <span>Cuisson (min)</span>
           <input type="number" inputmode="numeric" min="0" value=${f.cuisson} onInput=${(e) => maj('cuisson', e.target.value)} />
+        </label>
+        <label class="champ">
+          <span>Repos (min)</span>
+          <input type="number" inputmode="numeric" min="0" value=${f.repos || ''} placeholder="0" onInput=${(e) => maj('repos', e.target.value)} />
         </label>
         <label class="champ">
           <span>Difficulté</span>

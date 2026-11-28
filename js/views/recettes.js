@@ -367,6 +367,7 @@ export function Recette({ id, q }) {
       ${r.difficulte && html`<li class=${r.difficulte.length > 12 ? 'fait-long' : ''}><small>Difficulté</small><strong>${r.difficulte}<${Barres} n=${niveauDifficulte(r.difficulte)} /></strong></li>`}
       ${r.preparation > 0 && html`<li><small>Préparation</small><strong>${duree(r.preparation)}</strong></li>`}
       <li><small>Cuisson</small><strong>${r.cuisson ? duree(r.cuisson) : 'aucune'}</strong></li>
+      ${r.repos > 0 && html`<li><small>Repos</small><strong>${duree(r.repos)}</strong></li>`}
     </ul>
 
     ${(r.etiquettes || []).length > 0 && html`<ul class="etiquettes" aria-label="Étiquettes">${r.etiquettes.map((e) => html`<li key=${e}>${e}</li>`)}</ul>`}
