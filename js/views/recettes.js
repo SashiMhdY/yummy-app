@@ -1,7 +1,7 @@
 import { html, useState, useMemo, useEffect } from '../vendor/htm-preact.js';
 import { store } from '../store.js';
 import { useStore, Plaque, Barre, Feuille, Compteur, Ico, naviguer, Image, Puce, MiniMacros, MACROS, niveauKcal } from '../ui.js';
-import { norm, slug, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong } from '../util.js';
+import { norm, slug, duree, nombre, quantite, lundi, addDays, toISO, jourCourt, uid, jourLong, lienWeb } from '../util.js';
 import { parPart, chargerDetails, detailsParPart, AR } from '../nutrition.js';
 import { md } from '../md.js';
 import { usePhoto, envoyerPhoto, envoyerCouverture } from '../photos.js';
@@ -394,7 +394,7 @@ export function Recette({ id, q }) {
       <div dangerouslySetInnerHTML=${{ __html: md(r.ingredients_texte) }}></div>
     </details>`}
 
-    ${r.url && html`<p class="aide"><a href=${r.url} target="_blank" rel="noopener">Recette en ligne</a></p>`}
+    ${lienWeb(r.url) && html`<p class="aide"><a href=${lienWeb(r.url)} target="_blank" rel="noopener">Recette en ligne</a></p>`}
     <p class="centre"><button class="btn-danger" onClick=${supprimer}>Supprimer la recette</button></p>
 
     ${planifier && html`<${Planifier} recette=${r} partsInit=${parts} onFermer=${() => setPlanifier(false)} />`}
