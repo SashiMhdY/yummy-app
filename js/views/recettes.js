@@ -339,7 +339,8 @@ export function Recette({ id, q }) {
     naviguer('#/recettes');
   };
 
-  return html`<main class="vue vue-recette">
+  const source = (r.sources || []).filter(Boolean).join(', ');
+  return html`<main class=${`vue vue-recette${r.photo ? ' avec-photo' : ''}`}>
     <${Barre} retour="#/recettes" retourLabel="Recettes">
       <${Etoile} recette=${r} classe="etoile-barre" />
       <a class="btn btn-petit btn-second" href=${`#/recette/${r.id}/modifier`}>Modifier</a>
@@ -350,15 +351,22 @@ export function Recette({ id, q }) {
           <${BoutonPhoto} envoyer=${(f) => envoyerPhoto(r, f)} classe="photo-changer" label="Changer la photo">${Ico.photo()}<//>
         </figure>`
       : html`<${BoutonPhoto} envoyer=${(f) => envoyerPhoto(r, f)} classe="photo-vide" label="Ajouter une photo du plat">${Ico.plus()}<span>Ajouter une photo du plat</span><//>`}
-    <div class=${r.photo ? 'tete-sur-photo' : ''}>
-      <${Plaque} sous=${[r.type, ...(r.sources || [])].filter(Boolean).join(', ')}>${r.nom}<//>
-    </div>
+    <div class="fiche-corps">
+    <header class="fiche-tete">
+      ${r.type && html`<p class="fiche-type">${r.type}</p>`}
+      <h1 class="fiche-titre">${r.nom}</h1>
+      ${source && html`<p class="fiche-source">${source}</p>`}
+    </header>
 
     <ul class="faits">
-      ${r.preparation > 0 && html`<li><span class="fait-ico">${Ico.toque()}</span><span><small>Préparation</small><strong>${duree(r.preparation)}</strong></span></li>`}
-      <li><span class="fait-ico">${Ico.horloge()}</span><span><small>Cuisson</small><strong>${r.cuisson ? duree(r.cuisson) : 'aucune'}</strong></span></li>
-      ${r.difficulte && html`<li><span class="fait-ico">${Ico.etoile()}</span><span><small>Difficulté</small><strong>${r.difficulte}</strong></span></li>`}
+      ${r.difficulte && html`<li><small>Difficulté</small><strong>${r.difficulte}</strong></li>`}
+      ${r.preparation > 0 && html`<li><small>Préparation</small><strong>${duree(r.preparation)}</strong></li>`}
+      <li><small>Cuisson</small><strong>${r.cuisson ? duree(r.cuisson) : 'aucune'}</strong></li>
     </ul>
+
+    ${(r.etiquettes || []).length > 0 && html`<ul class="etiquettes" aria-label="Étiquettes">${r.etiquettes.map((e) => html`<li key=${e}>${e}</li>`)}</ul>`}
+
+    ${r.intro && html`<section class="bloc texte intro" dangerouslySetInnerHTML=${{ __html: md(r.intro) }}></section>`}
 
     <${CarteMacros} pp=${pp} recette=${r} />
 
@@ -380,8 +388,6 @@ export function Recette({ id, q }) {
       ${r.allergenes && html`<p class="aide">Allergènes : ${r.allergenes}</p>`}
     </section>
 
-    ${r.intro && html`<section class="bloc texte" dangerouslySetInnerHTML=${{ __html: md(r.intro) }}></section>`}
-
     ${r.etapes &&
     html`<section class="bloc carte texte">
       <h2>Préparation</h2>
@@ -396,6 +402,7 @@ export function Recette({ id, q }) {
 
     ${lienWeb(r.url) && html`<p class="aide"><a href=${lienWeb(r.url)} target="_blank" rel="noopener">Recette en ligne</a></p>`}
     <p class="centre"><button class="btn-danger" onClick=${supprimer}>Supprimer la recette</button></p>
+    </div>
 
     ${planifier && html`<${Planifier} recette=${r} partsInit=${parts} onFermer=${() => setPlanifier(false)} />`}
   </main>`;
