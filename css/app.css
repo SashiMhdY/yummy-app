@@ -901,3 +901,35 @@ body { line-height: 1.5; }
 .vue-recette .faits li { align-items: flex-start; }
 .vue-recette .faits .fait-long { flex-basis: 100%; }
 .vue-recette .faits .fait-long + li { padding-left: 0; border-left: 0; }
+
+/* ---------- Bandeau d'infos de la fiche (1.9) ----------
+   Police système (SF Pro sur iPhone), libellés fins, valeurs en gras plus grandes,
+   filets verticaux gris clair, difficulté en trois pilules orange. */
+.vue-recette .faits {
+  --faits-encre: #3C2002;
+  flex-wrap: nowrap; row-gap: 0; margin: 0 0 1.1rem; overflow-x: auto; scrollbar-width: none;
+  font-family: system-ui, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  color: var(--faits-encre);
+}
+.vue-recette .faits::-webkit-scrollbar { display: none; }
+.vue-recette .faits li, .vue-recette .faits li:first-child {
+  flex: none; gap: 0.3rem; padding: 0.15rem 0.55rem 0.2rem; align-items: flex-start;
+}
+.vue-recette .faits li:first-child { padding-left: 0; }
+.vue-recette .faits li + li, .vue-recette .faits .fait-long + li { padding-left: 0.55rem; border-left: 1px solid #CFCBC4; }
+.vue-recette .faits .fait-long { flex-basis: auto; }
+.vue-recette .faits small { color: var(--faits-encre); font-size: 0.875rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; }
+.vue-recette .faits strong { gap: 0.5rem; color: var(--faits-encre); font-size: 1.125rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; white-space: nowrap; }
+.barres { gap: 0.15rem; align-items: center; }
+.barres i { width: 0.36rem; height: 0.78rem; border-radius: 999px; background: #EECBA9; }
+.barres i.on { background: #E17208; }
+.vue-recette .faits { flex-wrap: wrap; row-gap: 0.8rem; overflow: visible; }
+.vue-recette .faits .fait-long { flex-basis: 100%; }
+.vue-recette .faits .fait-long + li { padding-left: 0; border-left: 0; }
+.vue-recette.avec-photo .fiche-entete { margin-left: -0.4rem; margin-right: -0.4rem; padding-left: 1.1rem; padding-right: 1.1rem; }
+.vue-recette .faits li + li, .vue-recette .faits .fait-long + li + li { padding-left: 0.6rem; }
+.vue-recette .faits li { padding-right: 0.6rem; }
+/* une seule ligne comme dans l'app (défilement horizontal si l'écran est trop étroit), sauf difficulté au long libellé */
+.vue-recette .faits:not(:has(.fait-long)) { flex-wrap: nowrap; overflow-x: auto; margin-right: -1.1rem; padding-right: 1.1rem; }
+.vue-recette .faits li, .vue-recette .faits li:first-child { padding-right: 0.5rem; }
+.vue-recette .faits li + li, .vue-recette .faits .fait-long + li + li { padding-left: 0.5rem; }
