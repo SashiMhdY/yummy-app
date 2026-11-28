@@ -319,6 +319,10 @@ export function Recettes() {
 }
 
 // ---------- Fiche ----------
+// Difficulté en 1 à 3 barres (texte libre : « Facile », « Demande un peu de pratique », « Difficile »…).
+const niveauDifficulte = (t) => (/difficile/i.test(t) ? 3 : /facile/i.test(t) ? 1 : 2);
+const Barres = ({ n }) => html`<span class="barres" aria-hidden="true">${[1, 2, 3].map((k) => html`<i class=${k <= n ? 'on' : ''}></i>`)}</span>`;
+const allerA = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 export function Recette({ id, q }) {
   const s = useStore();
   const r = s.local.recettes.recettes.find((x) => x.id === id);
@@ -352,6 +356,7 @@ export function Recette({ id, q }) {
         </figure>`
       : html`<${BoutonPhoto} envoyer=${(f) => envoyerPhoto(r, f)} classe="photo-vide" label="Ajouter une photo du plat">${Ico.plus()}<span>Ajouter une photo du plat</span><//>`}
     <div class="fiche-corps">
+    <section class="fiche-entete">
     <header class="fiche-tete">
       ${r.type && html`<p class="fiche-type">${r.type}</p>`}
       <h1 class="fiche-titre">${r.nom}</h1>
@@ -359,20 +364,25 @@ export function Recette({ id, q }) {
     </header>
 
     <ul class="faits">
-      ${r.difficulte && html`<li><small>Difficulté</small><strong>${r.difficulte}</strong></li>`}
+      ${r.difficulte && html`<li class=${r.difficulte.length > 12 ? 'fait-long' : ''}><small>Difficulté</small><strong>${r.difficulte}<${Barres} n=${niveauDifficulte(r.difficulte)} /></strong></li>`}
       ${r.preparation > 0 && html`<li><small>Préparation</small><strong>${duree(r.preparation)}</strong></li>`}
       <li><small>Cuisson</small><strong>${r.cuisson ? duree(r.cuisson) : 'aucune'}</strong></li>
     </ul>
 
     ${(r.etiquettes || []).length > 0 && html`<ul class="etiquettes" aria-label="Étiquettes">${r.etiquettes.map((e) => html`<li key=${e}>${e}</li>`)}</ul>`}
 
-    ${r.intro && html`<section class="bloc texte intro" dangerouslySetInnerHTML=${{ __html: md(r.intro) }}></section>`}
+    ${r.intro && html`<div class="texte intro" dangerouslySetInnerHTML=${{ __html: md(r.intro) }}></div>`}
+
+    <div class="fiche-actions">
+      <button class="btn" onClick=${() => setPlanifier(true)}>${Ico.semaine()}<span>Planifier</span></button>
+      <button class="btn btn-second" onClick=${() => allerA('fiche-ingredients')}>Ingrédients</button>
+      ${r.etapes && html`<button class="btn btn-second" onClick=${() => allerA('fiche-etapes')}>Étapes</button>`}
+    </div>
+    </section>
 
     <${CarteMacros} pp=${pp} recette=${r} />
 
-    <button class="btn btn-large" onClick=${() => setPlanifier(true)}>${Ico.semaine()}<span>Planifier ce plat</span></button>
-
-    <section class="bloc carte">
+    <section class="bloc fiche-ingredients" id="fiche-ingredients">
       <div class="bloc-tete">
         <h2>Ingrédients</h2>
         <${Compteur} valeur=${parts} onChange=${setParts} label="Nombre de parts" />
@@ -389,8 +399,8 @@ export function Recette({ id, q }) {
     </section>
 
     ${r.etapes &&
-    html`<section class="bloc carte texte">
-      <h2>Préparation</h2>
+    html`<section class="bloc texte fiche-etapes" id="fiche-etapes">
+      <h2>Étapes</h2>
       <div dangerouslySetInnerHTML=${{ __html: md(r.etapes) }}></div>
     </section>`}
 
