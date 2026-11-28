@@ -1,8 +1,11 @@
-/* Yummy : blanc émail, bleu cobalt des plaques émaillées. */
+/* Yummy : blanc émail, bleu cobalt des plaques émaillées.
+   Depuis la 1.7 : ambiance « potager » (lin, terracotta, titres à empattements), voir la fin du fichier. */
 
 @font-face { font-family: 'Sofia Sans'; font-weight: 400; font-display: swap; src: url('../fonts/sofia-sans-latin-400-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Sofia Sans'; font-weight: 600; font-display: swap; src: url('../fonts/sofia-sans-latin-600-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Sofia Sans'; font-weight: 700; font-display: swap; src: url('../fonts/sofia-sans-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fraunces'; font-weight: 500; font-display: swap; src: url('../fonts/fraunces-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fraunces'; font-weight: 600; font-display: swap; src: url('../fonts/fraunces-latin-600-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Sofia Plaque'; font-weight: 700; font-display: swap; src: url('../fonts/sofia-sans-extra-condensed-latin-700-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Sofia Plaque'; font-weight: 800; font-display: swap; src: url('../fonts/sofia-sans-extra-condensed-latin-800-normal.woff2') format('woff2'); }
 
@@ -642,3 +645,143 @@ input:focus-visible + .case { outline: 2px solid var(--cobalt); outline-offset: 
 .ar-pct { display: inline-block; min-width: 2.4rem; color: var(--chine); font-size: var(--t-xs); }
 @media (prefers-reduced-motion: reduce) { .details-nutri summary .chevron { transition: none; } }
 .tableau-nutri tbody th small { font-weight: 400; color: var(--chine); font-size: var(--t-xs); }
+
+/* ==========================================================
+   Ambiance « potager » (1.7) : fond lin, cartes crème,
+   accent terracotta, titres à empattements Fraunces.
+   ========================================================== */
+:root {
+  --email: #FBF7F0;
+  --blanc: #FFFDF9;
+  --encre: #3B2A20;
+  --chine: #85715F;
+  --trait: #E8DECF;
+  --cobalt: #C25E26;        /* l'accent : terracotta */
+  --cobalt-sombre: #9E4A1C;
+  --cobalt-pale: #FAE6D6;
+  --fond: #F4EEE3;
+  --creme: #F7F1E7;         /* fond des tuiles dans les cartes */
+  --ombre: 0 1px 2px rgba(59, 42, 32, 0.05), 0 4px 14px rgba(59, 42, 32, 0.06);
+  --rayon: 1.25rem;
+  --titre: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --gluc: #A8701A;
+  --lip: #2F7F86;      --lip-pale: #DCEFEF;
+  --fib: #4E8A3A;      --fib-pale: #E6F1DC;
+}
+body { line-height: 1.5; }
+.image, .photo-plat, .liste-recettes .vignette, .vignette, .entree-vignette, .couverture { background: #EAE1D3; }
+
+/* titres : Fraunces brun à la place de la plaque émaillée */
+.plaque, .plaque-grande {
+  padding: 0; border-radius: 0; background: none; box-shadow: none;
+  color: var(--encre); font-family: var(--titre); font-weight: 600; font-size: 2.1rem; letter-spacing: -0.01em; line-height: 1.12;
+}
+.plaque-grande { font-size: 2.75rem; }
+.plaque-sous { color: var(--chine); }
+.carte > h2, .carte .bloc-tete h2, .carte-tete h2, .bloc > h2, .bloc-tete h2, .titre-section, legend, .feuille-tete h2 {
+  font-family: var(--titre); font-weight: 600; letter-spacing: -0.005em;
+}
+.livre h2, .rayon h2, .choix-nom { font-family: var(--titre); font-weight: 600; color: var(--encre); }
+.livre-titre small, .rayon-nb { font-family: var(--texte); }
+.jour-num, .jours-choix strong { font-family: var(--titre); font-weight: 600; }
+.jour-auj .jour-num { color: var(--cobalt); }
+.jauge-pct, .macro-texte strong { font-family: var(--titre); font-weight: 600; }
+
+/* boutons pleins en pilule */
+.btn { border-radius: 999px; }
+.btn-second { background: var(--blanc); box-shadow: inset 0 0 0 1.5px var(--trait); color: var(--encre); }
+.segments { background: #EBE2D4; }
+.filtre.actif { background: var(--encre); border-color: var(--encre); }
+.onglets { background: rgba(255, 253, 249, 0.94); }
+.onglet.actif { color: var(--cobalt); }
+
+/* ---------- Liste des recettes : grille de cartes photo ---------- */
+.liste-recettes { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 1.1rem 0.85rem; }
+.liste-recettes .ligne-recette { position: relative; flex-direction: column; align-items: stretch; gap: 0.5rem; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+.liste-recettes .vignette, .liste-recettes .vignette-vide { width: 100%; height: auto; aspect-ratio: 1; border-radius: 1rem; box-shadow: var(--ombre); }
+.liste-recettes .vignette-vide { border-color: #D6C8B3; background: var(--blanc); }
+.liste-recettes a.ligne-texte { padding: 0 0.15rem; gap: 0.2rem; }
+.liste-recettes .liste-nom { font-size: var(--t-s); font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.liste-meta { order: -1; gap: 0.1rem 0.6rem; font-size: 0.75rem; }
+.liste-meta > :first-child { padding: 0; background: none; color: var(--cobalt); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.6875rem; }
+.liste-recettes .etoile { position: absolute; top: 0.45rem; right: 0.45rem; margin: 0; width: 2.25rem; height: 2.25rem; border-radius: 999px; background: rgba(255, 253, 249, 0.9); color: #B8A892; box-shadow: 0 1px 4px rgba(59, 42, 32, 0.18); }
+.liste-recettes .etoile .ico { width: 1.2rem; height: 1.2rem; }
+.mini-macros { font-size: 0.75rem; gap: 0.15rem 0.5rem; }
+.livre-tete { background: var(--blanc); }
+
+/* ---------- Fiche recette ---------- */
+.vue-recette.avec-photo { padding-top: 0; }
+.vue-recette.avec-photo .barre {
+  position: absolute; z-index: 3; top: calc(env(safe-area-inset-top) + 0.6rem); left: 0; right: 0;
+  max-width: 40rem; margin: 0 auto; padding: 0 var(--marge);
+}
+.vue-recette .barre-retour, .vue-recette .etoile-barre, .vue-recette .barre .btn-second, .vue-recette .barre .sync {
+  background: rgba(255, 253, 249, 0.92); color: var(--encre); border: 0; border-radius: 999px;
+  box-shadow: 0 1px 6px rgba(59, 42, 32, 0.18); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.vue-recette .barre-retour { margin-left: 0; padding: 0.45rem 0.85rem 0.45rem 0.5rem; }
+.vue-recette .etoile-barre { width: 2.5rem; height: 2.5rem; }
+.vue-recette .etoile-barre[aria-pressed='true'] { color: #D99A00; }
+.vue-recette.avec-photo .photo-plat {
+  margin: 0 calc(-1 * var(--marge)); aspect-ratio: 1 / 1; max-height: 62vh; width: auto;
+  border-radius: 0; box-shadow: none;
+}
+@media (min-width: 40rem) { .vue-recette.avec-photo .photo-plat { margin: 0; border-radius: 0 0 1.5rem 1.5rem; } }
+.vue-recette .photo-changer { top: auto; bottom: 2.4rem; color: var(--encre); background: rgba(255, 253, 249, 0.9); }
+.vue-recette.avec-photo .fiche-corps {
+  position: relative; z-index: 1; margin: -1.5rem calc(-1 * var(--marge)) 0; padding: 1.4rem var(--marge) 0;
+  border-radius: 1.6rem 1.6rem 0 0; background: var(--fond);
+}
+.fiche-tete { margin: 0.25rem 0 1rem; }
+.fiche-type { margin: 0 0 0.3rem; color: var(--cobalt); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.fiche-titre { font-family: var(--titre); font-weight: 600; font-size: 2rem; line-height: 1.12; letter-spacing: -0.01em; color: var(--encre); overflow-wrap: anywhere; }
+.fiche-source { margin: 0.45rem 0 0; color: var(--chine); font-size: var(--t-s); font-style: italic; }
+
+.vue-recette .faits {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; margin: 0 0 0.9rem; padding: 0.75rem 0.25rem;
+  border-radius: var(--rayon); background: var(--blanc); box-shadow: var(--ombre);
+}
+.vue-recette .faits li { display: flex; flex-direction: column; justify-content: flex-start; gap: 0.15rem; padding: 0 0.75rem; border-radius: 0; background: none; box-shadow: none; line-height: 1.2; }
+.vue-recette .faits li + li { border-left: 1px solid var(--trait); }
+.vue-recette .faits small { color: var(--chine); font-size: 0.75rem; }
+.vue-recette .faits strong { font-size: var(--t-s); }
+
+.etiquettes { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.5rem; padding: 0; }
+.etiquettes li { padding: 0.25rem 0.75rem; border-radius: 999px; background: var(--blanc); border: 1px solid var(--trait); color: var(--encre); font-size: var(--t-xs); font-weight: 600; }
+.etiquettes li::first-letter { text-transform: uppercase; }
+.vue-recette .intro { margin: 0.75rem 0 1.25rem; color: #5A4636; }
+.vue-recette .intro em { color: var(--chine); font-size: var(--t-s); }
+
+.carte-macros .carte-tete h2 { font-size: 1.4rem; }
+.macro { background: var(--creme); border-radius: 1rem; }
+.macro.m-kcal { background: var(--kcal-pale); }
+.macro-texte strong { font-size: 1.75rem; }
+.macro.m-kcal strong { font-size: 2.3rem; }
+.details-nutri { border-top-color: var(--trait); }
+.details-nutri summary { background: var(--creme); color: var(--encre); }
+.details-nutri summary .chevron { color: var(--cobalt); }
+.tableau-nutri caption { font-family: var(--titre); font-weight: 600; }
+.tableau-nutri tbody tr, .ingredients li, .article { border-bottom-color: #F0E8DC; }
+.ar-barre { background: #F0E8DC; }
+
+.vue-recette .btn-large { min-height: 3.4rem; border-radius: 999px; box-shadow: 0 4px 14px rgba(194, 94, 38, 0.3); }
+.vue-recette .bloc.carte { padding: 1.15rem 1.1rem; }
+.vue-recette .bloc-tete h2, .vue-recette .bloc.carte > h2 { font-size: 1.4rem; }
+.ingredients li { align-items: baseline; padding: 0.6rem 0; }
+.ing-qte { color: var(--cobalt-sombre); }
+.texte ol li { padding: 0.1rem 0 1rem 2.75rem; }
+.texte ol li::before {
+  top: -0.05rem; width: 2rem; height: 2rem; border-radius: 999px;
+  background: var(--cobalt-pale); color: var(--cobalt-sombre); font-family: var(--titre); font-weight: 600; font-size: 1rem;
+}
+.texte ol li + li { border-top: 1px dashed var(--trait); padding-top: 0.9rem; }
+.texte ol li + li::before { top: 0.75rem; }
+.origine summary, .avance summary { color: var(--cobalt-sombre); }
+/* semaine, profils et courses aux couleurs lin */
+.jour-passe { background: #F9F4EC; }
+.jour-passe .jour-num, .jour-passe .jour-nom, .pas-mange .repas-nom, .article.coche .article-nom, .article.coche .article-qte { color: #B5A590; }
+.entree { background: var(--creme); }
+.ajouter, .vide { border-color: #D6C8B3; }
+.jauge-barre, .panier-jauge { background: #F0E8DC; }
+.case { border-color: #C2B29C; }
+.voile { background: rgba(59, 42, 32, 0.42); }

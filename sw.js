@@ -5,7 +5,7 @@
 
 // À changer à chaque nouvelle version de l'app (même numéro que VERSION dans js/views/reglages.js) :
 // le téléphone détecte alors la mise à jour et affiche « Nouvelle version disponible ».
-const CACHE = 'yummy-app-1.6.1';
+const CACHE = 'yummy-app-1.7.0';
 const FICHIERS = [
   './',
   './index.html',
@@ -27,6 +27,8 @@ const FICHIERS = [
   './js/views/reglages.js',
   './js/views/profils.js',
   './data/aliments.json',
+  './fonts/fraunces-latin-500-normal.woff2',
+  './fonts/fraunces-latin-600-normal.woff2',
   './fonts/sofia-sans-latin-400-normal.woff2',
   './fonts/sofia-sans-latin-600-normal.woff2',
   './fonts/sofia-sans-latin-700-normal.woff2',

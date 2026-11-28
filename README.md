@@ -40,5 +40,5 @@ Pas de compilation : les fichiers sont servis tels quels.
 
 - Valeurs nutritionnelles : ANSES, table de composition nutritionnelle des aliments Ciqual (Licence Ouverte).
 - Besoins journaliers (estimations indicatives) : formule de Black et al. (1996) pour le métabolisme de base des adultes, niveaux d’activité et besoins énergétiques des enfants de l’EFSA (2013), protéines de l’Anses (adultes) et de l’EFSA (enfants, 2012), lipides, glucides et fibres de l’Anses (2016 et 2019).
-- Police : Sofia Sans, par Lettersoup (SIL Open Font License, voir `fonts/LICENSE-OFL.txt`).
+- Polices : Sofia Sans, par Lettersoup (SIL Open Font License, voir `fonts/LICENSE-OFL.txt`), et Fraunces, par Undercase Type (SIL Open Font License, voir `fonts/LICENSE-OFL-Fraunces.txt`).
 - [Preact](https://preactjs.com) (MIT) et [htm](https://github.com/developit/htm) (Apache-2.0).
